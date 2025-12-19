@@ -1,0 +1,23 @@
+{
+  "asset_id": "09561e0a6685b1a531ccf47108f0549d",
+  "public_id": "products/sk2gwqiw80d3rmrs2bei",
+  "version": 1766046326,
+  "version_id": "c759b84ecfcc46c933eaf689b5d921d7",
+  "signature": "a5da93fc123984ce7aced9ca8c9a7096f392d506",
+  "width": 1024,
+  "height": 1024,
+  "format": "png",
+  "resource_type": "image",
+  "created_at": "2025-12-18T08:25:26Z",
+  "tags": [],
+  "bytes": 189684,
+  "type": "upload",
+  "etag": "fa570841a9a268fd8915d0682c685e2e",
+  "placeholder": false,
+  "url": "http://res.cloudinary.com/dwhzpuodt/image/upload/v1766046326/products/sk2gwqiw80d3rmrs2bei.png",
+  "secure_url": "https://res.cloudinary.com/dwhzpuodt/image/upload/v1766046326/products/sk2gwqiw80d3rmrs2bei.png",
+  "asset_folder": "products",
+  "display_name": "sk2gwqiw80d3rmrs2bei",
+  "original_filename": "file",
+  "api_key": "953698665329847"
+}

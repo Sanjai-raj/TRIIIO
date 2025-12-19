@@ -1,0 +1,7 @@
+{
+  "name": "Men's Threads - MERN Store",
+  "description": "A production-ready MERN stack ecommerce platform for men's wear with separate Customer and Admin portals.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

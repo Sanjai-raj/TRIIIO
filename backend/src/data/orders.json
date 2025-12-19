@@ -1,0 +1,11 @@
+[
+  {
+    "user": "64e3fbbf....", 
+    "items": [{"product": "64e3fc...", "qty": 1, "price":499}],
+    "shippingAddress": {"line1":"..."},
+    "orderAmount": 499,
+    "paymentMethod": "COD",
+    "paymentStatus": "Pending",
+    "orderStatus": "Pending"
+  }
+]

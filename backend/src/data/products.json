@@ -1,0 +1,108 @@
+[
+  {
+    "name": "Classic White Tee",
+    "description": "Premium cotton essential t-shirt",
+    "category": "Casual",
+    "brand": "TRIIIO",
+    "price": 2400,
+    "discount": 0,
+    "stock": 50,
+    "status": "active",
+    "images": [
+      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=800&q=80"
+    ],
+    "colors": [
+      "White"
+    ],
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ]
+  },
+  {
+    "name": "Midnight Blue Shirt",
+    "description": "Formal midnight blue shirt for evening wear",
+    "category": "Formal",
+    "brand": "TRIIIO",
+    "price": 4500,
+    "discount": 10,
+    "stock": 35,
+    "status": "active",
+    "images": [
+      "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=800&q=80"
+    ],
+    "colors": [
+      "Blue"
+    ],
+    "sizes": [
+      "M",
+      "L",
+      "XL"
+    ]
+  },
+  {
+    "name": "Urban Grey Hoodie",
+    "description": "Comfortable streetwear hoodie",
+    "category": "Casual",
+    "brand": "TRIIIO",
+    "price": 5500,
+    "discount": 0,
+    "stock": 20,
+    "status": "active",
+    "images": [
+      "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80"
+    ],
+    "colors": [
+      "Grey"
+    ],
+    "sizes": [
+      "S",
+      "M",
+      "L"
+    ]
+  },
+  {
+    "name": "Denim Jacket",
+    "description": "Classic vintage wash denim jacket",
+    "category": "Denim",
+    "brand": "TRIIIO",
+    "price": 8900,
+    "discount": 0,
+    "stock": 15,
+    "status": "active",
+    "images": [
+      "https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?auto=format&fit=crop&w=800&q=80"
+    ],
+    "colors": [
+      "Blue"
+    ],
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ]
+  },
+  {
+    "name": "Linen Summer Shirt",
+    "description": "Breathable linen shirt perfect for summer",
+    "category": "Linen",
+    "brand": "TRIIIO",
+    "price": 3200,
+    "discount": 5,
+    "stock": 40,
+    "status": "active",
+    "images": [
+      "https://images.unsplash.com/photo-1589465885857-44edb59ef526?auto=format&fit=crop&w=800&q=80"
+    ],
+    "colors": [
+      "Beige"
+    ],
+    "sizes": [
+      "M",
+      "L"
+    ]
+  }
+]
