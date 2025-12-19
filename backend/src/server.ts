@@ -165,6 +165,15 @@ const owner = (req: Request, res: Response, next: NextFunction) => {
 
 // --- ROUTES ---
 
+// Health Check
+app.get("/api/health", (req, res) => {
+  res.status(200).json({
+    status: "OK",
+    service: "TRIIIO Backend",
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // Auth
 app.post('/api/auth/signup', async (req: any, res: any) => {
   try {
@@ -270,7 +279,7 @@ app.get('/api/upload-sign', (req, res) => {
 });
 
 // Products
-app.get('/api/products', async (req: { query: { search: any; category: any; sort: any; size: any; color: any; limit: any; minPrice: any; maxPrice: any; }; }, res: { send: (arg0: (mongoose.Document<unknown, {}, { rating: number; tags: string[]; sizes: string[]; variants: mongoose.Types.DocumentArray<{ stock?: number | null | undefined; size?: string | null | undefined; }, mongoose.Types.Subdocument<mongoose.mongo.BSON.ObjectId, unknown, { stock?: number | null | undefined; size?: string | null | undefined; }> & { stock?: number | null | undefined; size?: string | null | undefined; }>; colors: string[]; status: string; images: mongoose.Types.DocumentArray<{ url?: string | null | undefined; publicId?: string | null | undefined; }, mongoose.Types.Subdocument<mongoose.mongo.BSON.ObjectId, unknown, { url?: string | null | undefined; publicId?: string | null | undefined; }> & { url?: string | null | undefined; publicId?: string | null | undefined; }>; reviews: mongoose.Types.DocumentArray<{ date: NativeDate; comment?: string | null | undefined; user?: string | null | undefined; userId?: string | null | undefined; rating?: number | null | undefined; }, mongoose.Types.Subdocument<mongoose.mongo.BSON.ObjectId, unknown, { date: NativeDate; comment?: string | null | undefined; user?: string | null | undefined; userId?: string | null | undefined; rating?: number | null | undefined; }> & { date: NativeDate; comment?: string | null | undefined; user?: string | null | undefined; userId?: string | null | undefined; rating?: number | null | undefined; }>; name?: string | null | undefined; description?: string | null | undefined; category?: string | null | undefined; brand?: string | null | undefined; price?: number | null | undefined; discount?: number | null | undefined; stock?: number | null | undefined; } & mongoose.DefaultTimestampProps, { id: string; }, { timestamps: true; }> & Omit<{ rating: number; tags: string[]; sizes: string[]; variants: mongoose.Types.DocumentArray<{ stock?: number | null | undefined; size?: string | null | undefined; }, mongoose.Types.Subdocument<mongoose.mongo.BSON.ObjectId, unknown, { stock?: number | null | undefined; size?: string | null | undefined; }> & { stock?: number | null | undefined; size?: string | null | undefined; }>; colors: string[]; status: string; images: mongoose.Types.DocumentArray<{ url?: string | null | undefined; publicId?: string | null | undefined; }, mongoose.Types.Subdocument<mongoose.mongo.BSON.ObjectId, unknown, { url?: string | null | undefined; publicId?: string | null | undefined; }> & { url?: string | null | undefined; publicId?: string | null | undefined; }>; reviews: mongoose.Types.DocumentArray<{ date: NativeDate; comment?: string | null | undefined; user?: string | null | undefined; userId?: string | null | undefined; rating?: number | null | undefined; }, mongoose.Types.Subdocument<mongoose.mongo.BSON.ObjectId, unknown, { date: NativeDate; comment?: string | null | undefined; user?: string | null | undefined; userId?: string | null | undefined; rating?: number | null | undefined; }> & { date: NativeDate; comment?: string | null | undefined; user?: string | null | undefined; userId?: string | null | undefined; rating?: number | null | undefined; }>; name?: string | null | undefined; description?: string | null | undefined; category?: string | null | undefined; brand?: string | null | undefined; price?: number | null | undefined; discount?: number | null | undefined; stock?: number | null | undefined; } & mongoose.DefaultTimestampProps & { _id: mongoose.Types.ObjectId; } & { __v: number; }, "id"> & { id: string; })[]) => void; status: (arg0: number) => { (): any; new(): any; send: { (arg0: unknown): void; new(): any; }; }; }) => {
+app.get('/api/products', async (req: Request, res: Response) => {
   try {
     const { search, category, sort, size, color, limit, minPrice, maxPrice, status } = req.query;
     let query: any = {};
@@ -281,7 +290,7 @@ app.get('/api/products', async (req: { query: { search: any; category: any; sort
     } else if (status) {
       query.status = status;
     } else {
-      Microsoft.QuickAction.WiFi
+
       query.status = 'active';
     }
 
