@@ -9,7 +9,7 @@ import { useCurrency } from '../../context/CurrencyContext';
 const ProductForm: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { exchangeRate, formatPrice } = useCurrency();
+  const { formatPrice } = useCurrency();
   const isEdit = !!id;
 
   const [formData, setFormData] = useState({
@@ -32,10 +32,7 @@ const ProductForm: React.FC = () => {
     if (isEdit) {
       api.get(`/products/${id}`).then(res => {
         const p = res.data;
-        // Convert stored USD price to Display INR price
-        // If price is 100 USD, we want to show 8400 INR.
-        // So we multiple by exchangeRate.
-        // FIX: Backend already stores INR, so we use p.price directly.
+
         const priceInINR = p.price || 0;
 
         setFormData({
