@@ -15,7 +15,7 @@ const AdminDashboard: React.FC = () => {
 
   useEffect(() => {
     // Fetch initial stats
-    api.get('/api/admin/stats').then(res => setStats(res.data)).catch(console.error);
+    api.get('/admin/stats').then(res => setStats(res.data)).catch(console.error);
 
     // Mock Sales Data for Graph (Adjusted to assumed USD values for demo consistency if needed, assuming these are raw numbers)
     // If we want "entire... including conversions", we should display these as converted.
@@ -45,7 +45,7 @@ const AdminDashboard: React.FC = () => {
     });
     socket.on('new-order', (data) => {
       setNotifications(prev => [`New Order: ${data.orderId} received!`, ...prev]);
-      api.get('/api/admin/stats').then(res => setStats(res.data));
+      api.get('/admin/stats').then(res => setStats(res.data));
     });
 
     return () => {

@@ -30,7 +30,7 @@ const ProductForm: React.FC = () => {
 
   useEffect(() => {
     if (isEdit) {
-      api.get(`/api/products/${id}`).then(res => {
+      api.get(`/products/${id}`).then(res => {
         const p = res.data;
 
         const priceInINR = p.price || 0;
@@ -124,13 +124,13 @@ const ProductForm: React.FC = () => {
     try {
       if (isEdit) {
         data.append("existingImages", JSON.stringify(existingImages));
-        await api.put(`/api/products/${id}`, data, {
+        await api.put(`/products/${id}`, data, {
           withCredentials: true,
           headers: { "Content-Type": "multipart/form-data" },
         });
         alert("Product updated successfully");
       } else {
-        await api.post("/api/products", data, {
+        await api.post("/products", data, {
           withCredentials: true,
           headers: { "Content-Type": "multipart/form-data" },
         });

@@ -17,7 +17,7 @@ const OrderSuccess: React.FC = () => {
     useEffect(() => {
         // Fetch order details
         if (orderId) {
-            api.get(`/api/orders/${orderId}`)
+            api.get(`/orders/${orderId}`)
                 .then(res => setOrder(res.data))
                 .catch(console.error)
                 .finally(() => setLoading(false));

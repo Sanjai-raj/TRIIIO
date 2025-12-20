@@ -63,7 +63,7 @@ const Navbar: React.FC = () => {
         const delayDebounceFn = setTimeout(async () => {
             if (searchQuery.length > 1) {
                 try {
-                    const res = await api.get(`/api/products?search=${searchQuery}&limit=5`);
+                    const res = await api.get(`/products?search=${searchQuery}&limit=5`);
                     setSearchResults(res.data.products || res.data);
                     setIsSearchOpen(true);
                 } catch (e) {

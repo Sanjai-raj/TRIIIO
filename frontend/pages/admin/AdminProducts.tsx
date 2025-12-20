@@ -17,12 +17,12 @@ const AdminProducts: React.FC = () => {
   }, []);
 
   const fetchProducts = () => {
-    api.get('/api/products?status=all').then(res => setProducts(res.data.products || res.data));
+    api.get('/products?status=all').then(res => setProducts(res.data.products || res.data));
   };
 
   const handleDelete = async (id: string) => {
     if (window.confirm("Are you sure?")) {
-      await api.delete(`/api/products/${id}`);
+      await api.delete(`/products/${id}`);
       fetchProducts();
     }
   };

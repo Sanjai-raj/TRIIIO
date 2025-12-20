@@ -3,6 +3,7 @@ import { User, AuthResponse } from '../types';
 import { api } from '../src/api/client';
 
 interface AuthContextType {
+  isAuthenticated: boolean;
   user: User | null;
   token: string | null;
   login: (data: AuthResponse) => void;
@@ -16,6 +17,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const isAuthenticated = !!user;
 
   useEffect(() => {
     const initAuth = async () => {
@@ -33,7 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       try {
-        const { data } = await api.get('/api/auth/me', {
+        const { data } = await api.get('/auth/me', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -42,12 +45,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Refresh stored user data
         localStorage.setItem('user', JSON.stringify(data));
       } catch (error: any) {
-        // If unauthorized, clear token and state in background ONLY if validation fails
-        if (error.response?.status === 401) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          setUser(null);
-        }
+        // Silent fail, just clear state if invalid
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setUser(null);
       } finally {
         setIsLoading(false);
       }
@@ -67,7 +68,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     try {
-      await api.post('/api/auth/logout');
+      await api.post('/auth/logout');
     } catch (e) {
       console.error("Logout error", e);
     }
@@ -79,7 +80,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isAdmin = user?.role === 'owner';
 
   return (
-    <AuthContext.Provider value={{ user, token: localStorage.getItem('token'), login, logout, isLoading, isAdmin }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, token: localStorage.getItem('token'), login, logout, isLoading, isAdmin }}>
       {children}
     </AuthContext.Provider>
   );

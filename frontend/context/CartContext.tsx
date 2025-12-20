@@ -20,13 +20,13 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { showToast } = useToast();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [items, setItems] = useState<CartItem[]>([]);
 
   // Fetch Cart on Login
   useEffect(() => {
     if (user) {
-      api.get('/api/cart')
+      api.get('/cart')
         .then(res => {
           // Backend returns: { _id, user, items: [{ product, quantity, ... }] }
           // Frontend expects: items array directly?
@@ -45,7 +45,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return; // Guests cannot add to cart
 
     try {
-      const res = await api.post('/api/cart/add', {
+      const res = await api.post('/cart/add', {
         productId: product._id,
         quantity,
         size,
@@ -60,7 +60,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const removeFromCart = async (productId: string, size: string, color: string) => {
-    // We need the SubDocument ID (_id) of the item to delete via API '/api/cart/:itemId'
+    // We need the SubDocument ID (_id) of the item to delete via API '/cart/:itemId'
     // Find it in local state
     const item = items.find(i =>
       i.product._id === productId && i.selectedSize === size && i.selectedColor === color
@@ -69,7 +69,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!item || !(item as any)._id) return; // Should have _id from backend
 
     try {
-      const res = await api.delete(`/api/cart/${(item as any)._id}`);
+      const res = await api.delete(`/cart/${(item as any)._id}`);
       setItems(res.data.items);
       showToast('Removed from cart', 'success');
     } catch (e) {
@@ -93,7 +93,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // I'll keep it simple for now as requested.
 
     try {
-      const res = await api.post('/api/cart/update', { itemId: (item as any)._id, quantity });
+      const res = await api.post('/cart/update', { itemId: (item as any)._id, quantity });
       setItems(res.data.items);
     } catch (e) {
       console.error(e);

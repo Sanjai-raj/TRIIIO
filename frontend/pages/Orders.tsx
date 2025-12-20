@@ -18,7 +18,7 @@ const Orders: React.FC = () => {
 
     useEffect(() => {
         if (user) {
-            api.get('/api/orders/myorders')
+            api.get('/orders/myorders')
                 .then(res => setOrders(res.data))
                 .catch(console.error)
                 .finally(() => setLoading(false));
@@ -52,7 +52,7 @@ const Orders: React.FC = () => {
 
         setCancelling(orderId);
         try {
-            await api.put(`/api/orders/${orderId}/cancel`);
+            api.put(`/orders/${orderId}/cancel`);
             // Update local state
             setOrders(prev => prev.map(o => o._id === orderId ? { ...o, orderStatus: 'Cancelled' } : o));
             alert("Order cancelled successfully.");

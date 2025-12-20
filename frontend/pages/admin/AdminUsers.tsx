@@ -15,7 +15,7 @@ const AdminUsers: React.FC = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const res = await api.get('/api/admin/users');
+      const res = await api.get('/admin/users');
       setUsers(res.data);
     } catch (e) {
       console.error(e);
@@ -34,7 +34,7 @@ const AdminUsers: React.FC = () => {
     if (!window.confirm(`Are you sure you want to ${action} ${user.name}?`)) return;
 
     try {
-      await api.put(`/api/admin/users/${user._id}`);
+      await api.put(`/admin/users/${user._id}`);
       // Optimistic update
       setUsers(prev => prev.map(u => u._id === user._id ? { ...u, isActive: !u.isActive } : u));
     } catch (e) {
@@ -125,8 +125,8 @@ const AdminUsers: React.FC = () => {
                     <button
                       onClick={() => toggleBlockUser(user)}
                       className={`flex items-center gap-1 text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-sm border ${user.isActive
-                          ? 'text-red-500 border-red-200 hover:bg-red-50'
-                          : 'text-green-500 border-green-200 hover:bg-green-50'
+                        ? 'text-red-500 border-red-200 hover:bg-red-50'
+                        : 'text-green-500 border-green-200 hover:bg-green-50'
                         }`}
                     >
                       {user.isActive ? <><FaBan size={10} /> Block</> : <><FaCheck size={10} /> Unblock</>}

@@ -29,7 +29,7 @@ const AdminOrders: React.FC = () => {
       if (searchId) params.append('search', searchId);
       if (filterDate) params.append('date', filterDate);
 
-      const res = await api.get(`/api/orders?${params.toString()}`);
+      const res = await api.get(`/orders?${params.toString()}`);
       setOrders(res.data);
     } catch (e) {
       console.error(e);
@@ -45,7 +45,7 @@ const AdminOrders: React.FC = () => {
 
   const updateStatus = async (id: string, status: string) => {
     try {
-      await api.put(`/api/orders/${id}`, { orderStatus: status });
+      await api.put(`/orders/${id}`, { orderStatus: status });
       fetchOrders(); // Refresh to see changes
     } catch (e) {
       alert("Error updating order");
@@ -56,7 +56,7 @@ const AdminOrders: React.FC = () => {
     if (!window.confirm(`Initiate refund for Order #${order._id.slice(-6)}? This will mark it as Refunded.`)) return;
 
     try {
-      await api.put(`/api/orders/${order._id}`, { orderStatus: 'Refunded', paymentStatus: 'Refunded' });
+      await api.put(`/orders/${order._id}`, { orderStatus: 'Refunded', paymentStatus: 'Refunded' });
       alert("Refund Processed Successfully (Status Updated)");
       fetchOrders();
     } catch (e) {

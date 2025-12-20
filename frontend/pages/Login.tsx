@@ -33,7 +33,7 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const endpoint = isLogin ? '/api/auth/login' : '/api/auth/signup';
+      const endpoint = isLogin ? '/auth/login' : '/auth/signup';
       const { data } = await api.post(endpoint, formData);
       login(data);
       showToast(isLogin ? "Welcome back!" : "Account created successfully!", 'success');

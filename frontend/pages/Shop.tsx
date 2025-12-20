@@ -63,7 +63,7 @@ const Shop: React.FC = () => {
         }
       }
 
-      const res = await api.get(`/api/products?${apiParams.toString()}`);
+      const res = await api.get(`/products?${apiParams.toString()}`);
       setProducts(res.data.products || res.data);
     } catch (err) {
       console.error(err);

@@ -33,7 +33,7 @@ export default function Addresses() {
 
     const loadAddresses = async () => {
         try {
-            const { data } = await api.get('/api/users/addresses');
+            const { data } = await api.get('/users/addresses');
             setAddresses(data);
         } catch (err) {
             console.error(err);
@@ -75,10 +75,10 @@ export default function Addresses() {
 
         try {
             if (editingId) {
-                await api.put(`/api/users/addresses/${editingId}`, form);
+                await api.put(`/users/addresses/${editingId}`, form);
                 showToast("Address updated successfully", 'success');
             } else {
-                await api.post('/api/users/addresses', form);
+                await api.post('/users/addresses', form);
                 showToast("Address added successfully", 'success');
             }
 
@@ -96,7 +96,7 @@ export default function Addresses() {
     const deleteAddress = async (id: string) => {
         if (!confirm("Are you sure you want to delete this address?")) return;
         try {
-            await api.delete(`/api/users/addresses/${id}`);
+            await api.delete(`/users/addresses/${id}`);
             loadAddresses();
             showToast("Address deleted", 'success');
         } catch (e: any) {

@@ -38,7 +38,7 @@ const EditProduct: React.FC = () => {
     useEffect(() => {
         if (isEdit) {
             setLoading(true);
-            api.get(`/api/products/${id}`).then(res => {
+            api.get(`/products/${id}`).then(res => {
                 const p = res.data;
 
                 setFormData({
@@ -112,12 +112,12 @@ const EditProduct: React.FC = () => {
             if (isEdit) {
                 data.append('existingImages', JSON.stringify(existingImages));
 
-                await api.put(`/api/products/${id}`, data, {
+                await api.put(`/products/${id}`, data, {
                     headers: { "Content-Type": "multipart/form-data" }
                 });
                 toast.success('Product updated!');
             } else {
-                await api.post('/api/products', data, {
+                await api.post('/products', data, {
                     headers: { "Content-Type": "multipart/form-data" }
                 });
                 toast.success('Product created!');
