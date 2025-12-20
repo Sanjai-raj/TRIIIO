@@ -166,7 +166,7 @@ const owner = (req: Request, res: Response, next: NextFunction) => {
 // --- ROUTES ---
 
 // Health Check
-app.get("/api/health", (req, res) => {
+app.get("/health", (req, res) => {
   res.status(200).json({
     status: "OK",
     service: "TRIIIO Backend",
@@ -175,7 +175,7 @@ app.get("/api/health", (req, res) => {
 });
 
 // Auth
-app.post('/api/auth/signup', async (req: any, res: any) => {
+app.post('/auth/signup', async (req: any, res: any) => {
   try {
     const { name, email, password } = req.body;
     const existingUser = await User.findOne({ email });
@@ -201,7 +201,7 @@ app.post('/api/auth/signup', async (req: any, res: any) => {
   }
 });
 
-app.post('/api/auth/login', async (req: any, res: any) => {
+app.post('/auth/login', async (req: any, res: any) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
@@ -231,7 +231,7 @@ app.post('/api/auth/login', async (req: any, res: any) => {
   }
 });
 
-app.post('/api/auth/logout', (req: any, res: any) => {
+app.post('/auth/logout', (req: any, res: any) => {
   res.clearCookie('token', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -240,12 +240,12 @@ app.post('/api/auth/logout', (req: any, res: any) => {
   res.send({ message: 'Logged out successfully' });
 });
 
-app.get('/api/auth/me', auth as any, (req: any, res: { send: (arg0: any) => void; }) => {
+app.get('/auth/me', auth as any, (req: any, res: { send: (arg0: any) => void; }) => {
   res.send(req.user);
 });
 
 // Cloudinary Signature Endpoint (for client-side uploads or debugging)
-app.get('/api/upload-sign', (req, res) => {
+app.get('/upload-sign', (req, res) => {
   try {
     const timestamp = Math.floor(Date.now() / 1000);
     // paramsToSign must match exactly what is sent to Cloudinary
@@ -279,7 +279,7 @@ app.get('/api/upload-sign', (req, res) => {
 });
 
 // Products
-app.get('/api/products', async (req: Request, res: Response) => {
+app.get('/products', async (req: Request, res: Response) => {
   try {
     const { search, category, sort, size, color, limit, minPrice, maxPrice, status } = req.query;
     let query: any = {};
@@ -317,7 +317,7 @@ app.get('/api/products', async (req: Request, res: Response) => {
   }
 });
 
-app.get('/api/products/:id', async (req: { params: { id: any; }; }, res: { status: (arg0: number) => { (): any; new(): any; send: { (): void; new(): any; }; }; send: (arg0: mongoose.Document<unknown, {}, { rating: number; tags: string[]; sizes: string[]; variants: mongoose.Types.DocumentArray<{ stock?: number | null | undefined; size?: string | null | undefined; }, mongoose.Types.Subdocument<mongoose.mongo.BSON.ObjectId, unknown, { stock?: number | null | undefined; size?: string | null | undefined; }> & { stock?: number | null | undefined; size?: string | null | undefined; }>; colors: string[]; status: string; images: mongoose.Types.DocumentArray<{ url?: string | null | undefined; publicId?: string | null | undefined; }, mongoose.Types.Subdocument<mongoose.mongo.BSON.ObjectId, unknown, { url?: string | null | undefined; publicId?: string | null | undefined; }> & { url?: string | null | undefined; publicId?: string | null | undefined; }>; reviews: mongoose.Types.DocumentArray<{ date: NativeDate; comment?: string | null | undefined; user?: string | null | undefined; userId?: string | null | undefined; rating?: number | null | undefined; }, mongoose.Types.Subdocument<mongoose.mongo.BSON.ObjectId, unknown, { date: NativeDate; comment?: string | null | undefined; user?: string | null | undefined; userId?: string | null | undefined; rating?: number | null | undefined; }> & { date: NativeDate; comment?: string | null | undefined; user?: string | null | undefined; userId?: string | null | undefined; rating?: number | null | undefined; }>; name?: string | null | undefined; description?: string | null | undefined; category?: string | null | undefined; brand?: string | null | undefined; price?: number | null | undefined; discount?: number | null | undefined; stock?: number | null | undefined; } & mongoose.DefaultTimestampProps, { id: string; }, { timestamps: true; }> & Omit<{ rating: number; tags: string[]; sizes: string[]; variants: mongoose.Types.DocumentArray<{ stock?: number | null | undefined; size?: string | null | undefined; }, mongoose.Types.Subdocument<mongoose.mongo.BSON.ObjectId, unknown, { stock?: number | null | undefined; size?: string | null | undefined; }> & { stock?: number | null | undefined; size?: string | null | undefined; }>; colors: string[]; status: string; images: mongoose.Types.DocumentArray<{ url?: string | null | undefined; publicId?: string | null | undefined; }, mongoose.Types.Subdocument<mongoose.mongo.BSON.ObjectId, unknown, { url?: string | null | undefined; publicId?: string | null | undefined; }> & { url?: string | null | undefined; publicId?: string | null | undefined; }>; reviews: mongoose.Types.DocumentArray<{ date: NativeDate; comment?: string | null | undefined; user?: string | null | undefined; userId?: string | null | undefined; rating?: number | null | undefined; }, mongoose.Types.Subdocument<mongoose.mongo.BSON.ObjectId, unknown, { date: NativeDate; comment?: string | null | undefined; user?: string | null | undefined; userId?: string | null | undefined; rating?: number | null | undefined; }> & { date: NativeDate; comment?: string | null | undefined; user?: string | null | undefined; userId?: string | null | undefined; rating?: number | null | undefined; }>; name?: string | null | undefined; description?: string | null | undefined; category?: string | null | undefined; brand?: string | null | undefined; price?: number | null | undefined; discount?: number | null | undefined; stock?: number | null | undefined; } & mongoose.DefaultTimestampProps & { _id: mongoose.Types.ObjectId; } & { __v: number; }, "id"> & { id: string; }) => void; }) => {
+app.get('/products/:id', async (req: { params: { id: any; }; }, res: { status: (arg0: number) => { (): any; new(): any; send: { (): void; new(): any; }; }; send: (arg0: mongoose.Document<unknown, {}, { rating: number; tags: string[]; sizes: string[]; variants: mongoose.Types.DocumentArray<{ stock?: number | null | undefined; size?: string | null | undefined; }, mongoose.Types.Subdocument<mongoose.mongo.BSON.ObjectId, unknown, { stock?: number | null | undefined; size?: string | null | undefined; }> & { stock?: number | null | undefined; size?: string | null | undefined; }>; colors: string[]; status: string; images: mongoose.Types.DocumentArray<{ url?: string | null | undefined; publicId?: string | null | undefined; }, mongoose.Types.Subdocument<mongoose.mongo.BSON.ObjectId, unknown, { url?: string | null | undefined; publicId?: string | null | undefined; }> & { url?: string | null | undefined; publicId?: string | null | undefined; }>; reviews: mongoose.Types.DocumentArray<{ date: NativeDate; comment?: string | null | undefined; user?: string | null | undefined; userId?: string | null | undefined; rating?: number | null | undefined; }, mongoose.Types.Subdocument<mongoose.mongo.BSON.ObjectId, unknown, { date: NativeDate; comment?: string | null | undefined; user?: string | null | undefined; userId?: string | null | undefined; rating?: number | null | undefined; }> & { date: NativeDate; comment?: string | null | undefined; user?: string | null | undefined; userId?: string | null | undefined; rating?: number | null | undefined; }>; name?: string | null | undefined; description?: string | null | undefined; category?: string | null | undefined; brand?: string | null | undefined; price?: number | null | undefined; discount?: number | null | undefined; stock?: number | null | undefined; } & mongoose.DefaultTimestampProps, { id: string; }, { timestamps: true; }> & Omit<{ rating: number; tags: string[]; sizes: string[]; variants: mongoose.Types.DocumentArray<{ stock?: number | null | undefined; size?: string | null | undefined; }, mongoose.Types.Subdocument<mongoose.mongo.BSON.ObjectId, unknown, { stock?: number | null | undefined; size?: string | null | undefined; }> & { stock?: number | null | undefined; size?: string | null | undefined; }>; colors: string[]; status: string; images: mongoose.Types.DocumentArray<{ url?: string | null | undefined; publicId?: string | null | undefined; }, mongoose.Types.Subdocument<mongoose.mongo.BSON.ObjectId, unknown, { url?: string | null | undefined; publicId?: string | null | undefined; }> & { url?: string | null | undefined; publicId?: string | null | undefined; }>; reviews: mongoose.Types.DocumentArray<{ date: NativeDate; comment?: string | null | undefined; user?: string | null | undefined; userId?: string | null | undefined; rating?: number | null | undefined; }, mongoose.Types.Subdocument<mongoose.mongo.BSON.ObjectId, unknown, { date: NativeDate; comment?: string | null | undefined; user?: string | null | undefined; userId?: string | null | undefined; rating?: number | null | undefined; }> & { date: NativeDate; comment?: string | null | undefined; user?: string | null | undefined; userId?: string | null | undefined; rating?: number | null | undefined; }>; name?: string | null | undefined; description?: string | null | undefined; category?: string | null | undefined; brand?: string | null | undefined; price?: number | null | undefined; discount?: number | null | undefined; stock?: number | null | undefined; } & mongoose.DefaultTimestampProps & { _id: mongoose.Types.ObjectId; } & { __v: number; }, "id"> & { id: string; }) => void; }) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return (res as any).status(404).send();
@@ -326,7 +326,7 @@ app.get('/api/products/:id', async (req: { params: { id: any; }; }, res: { statu
 });
 
 app.post(
-  "/api/products",
+  "/products",
   auth as any,
   owner as any,
   upload.array("images", 5) as any,
@@ -380,7 +380,7 @@ app.post(
   }
 );
 
-app.put('/api/products/:id', auth as any, owner as any, upload.array('images', 5) as any, async (req: any, res: any) => {
+app.put('/products/:id', auth as any, owner as any, upload.array('images', 5) as any, async (req: any, res: any) => {
   try {
     const product: any = await Product.findById(req.params.id);
     if (!product) {
@@ -463,7 +463,7 @@ app.put('/api/products/:id', auth as any, owner as any, upload.array('images', 5
   }
 });
 
-app.post('/api/products/:id/reviews', auth as any, async (req: any, res: { status: (arg0: number) => { (): any; new(): any; send: { (arg0: unknown): void; new(): any; }; }; }) => {
+app.post('/products/:id/reviews', auth as any, async (req: any, res: { status: (arg0: number) => { (): any; new(): any; send: { (arg0: unknown): void; new(): any; }; }; }) => {
   try {
     const { rating, comment } = req.body;
     const product = await Product.findById(req.params.id);
@@ -490,7 +490,7 @@ app.post('/api/products/:id/reviews', auth as any, async (req: any, res: { statu
   }
 });
 
-app.delete('/api/products/:id', auth as any, owner as any, async (req: { params: { id: any; }; }, res: { send: (arg0: { success: boolean; }) => void; status: (arg0: number) => { (): any; new(): any; send: { (arg0: unknown): void; new(): any; }; }; }) => {
+app.delete('/products/:id', auth as any, owner as any, async (req: { params: { id: any; }; }, res: { send: (arg0: { success: boolean; }) => void; status: (arg0: number) => { (): any; new(): any; send: { (arg0: unknown): void; new(): any; }; }; }) => {
   try {
     await Product.findByIdAndDelete(req.params.id);
     res.send({ success: true });
@@ -500,7 +500,7 @@ app.delete('/api/products/:id', auth as any, owner as any, async (req: { params:
 });
 
 // Orders & Payment
-app.post('/api/orders/create', auth as any, async (req: any, res: { send: (arg0: { id: any; dbOrderId: mongoose.Types.ObjectId; method: string; amount?: any; key?: string | undefined; }) => void; status: (arg0: number) => { (): any; new(): any; send: { (arg0: { message: string; }): void; new(): any; }; }; }) => {
+app.post('/orders/create', auth as any, async (req: any, res: { send: (arg0: { id: any; dbOrderId: mongoose.Types.ObjectId; method: string; amount?: any; key?: string | undefined; }) => void; status: (arg0: number) => { (): any; new(): any; send: { (arg0: { message: string; }): void; new(): any; }; }; }) => {
   try {
     const { items, orderAmount, shippingAddress, paymentMethod } = req.body;
 
@@ -552,7 +552,7 @@ app.post('/api/orders/create', auth as any, async (req: any, res: { send: (arg0:
   }
 });
 
-app.post('/api/payment/verify', auth as any, async (req: { body: { razorpay_order_id: any; razorpay_payment_id: any; razorpay_signature: any; dbOrderId: any; }; }, res: { send: (arg0: { status: string; }) => void; status: (arg0: number) => { (): any; new(): any; send: { (arg0: unknown): void; new(): any; }; }; }) => {
+app.post('/payment/verify', auth as any, async (req: { body: { razorpay_order_id: any; razorpay_payment_id: any; razorpay_signature: any; dbOrderId: any; }; }, res: { send: (arg0: { status: string; }) => void; status: (arg0: number) => { (): any; new(): any; send: { (arg0: unknown): void; new(): any; }; }; }) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, dbOrderId } = req.body;
 
@@ -585,7 +585,7 @@ app.post('/api/payment/verify', auth as any, async (req: { body: { razorpay_orde
 });
 
 // Owner Orders Route - ENHANCED FILTERING
-app.get('/api/orders', auth as any, owner as any, async (req: any, res: { send: (arg0: (mongoose.Document<unknown, {}, { items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps, { id: string; }, { timestamps: true; }> & Omit<{ items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps & { _id: mongoose.Types.ObjectId; } & { __v: number; }, "id"> & { id: string; })[]) => void; status: (arg0: number) => { (): any; new(): any; send: { (arg0: unknown): void; new(): any; }; }; }) => {
+app.get('/orders', auth as any, owner as any, async (req: any, res: { send: (arg0: (mongoose.Document<unknown, {}, { items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps, { id: string; }, { timestamps: true; }> & Omit<{ items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps & { _id: mongoose.Types.ObjectId; } & { __v: number; }, "id"> & { id: string; })[]) => void; status: (arg0: number) => { (): any; new(): any; send: { (arg0: unknown): void; new(): any; }; }; }) => {
   try {
     const { status, search, date } = req.query;
     let query: any = {};
@@ -618,7 +618,7 @@ app.get('/api/orders', auth as any, owner as any, async (req: any, res: { send: 
 });
 
 // User My Orders Route
-app.get('/api/orders/myorders', auth as any, async (req: any, res: { send: (arg0: (mongoose.Document<unknown, {}, { items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps, { id: string; }, { timestamps: true; }> & Omit<{ items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps & { _id: mongoose.Types.ObjectId; } & { __v: number; }, "id"> & { id: string; })[]) => void; status: (arg0: number) => { (): any; new(): any; send: { (arg0: unknown): void; new(): any; }; }; }) => {
+app.get('/orders/myorders', auth as any, async (req: any, res: { send: (arg0: (mongoose.Document<unknown, {}, { items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps, { id: string; }, { timestamps: true; }> & Omit<{ items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps & { _id: mongoose.Types.ObjectId; } & { __v: number; }, "id"> & { id: string; })[]) => void; status: (arg0: number) => { (): any; new(): any; send: { (arg0: unknown): void; new(): any; }; }; }) => {
   try {
     const orders = await Order.find({ user: req.user._id }).sort({ createdAt: -1 });
     res.send(orders);
@@ -628,7 +628,7 @@ app.get('/api/orders/myorders', auth as any, async (req: any, res: { send: (arg0
 });
 
 // User Single Order Route (for Success Page)
-app.get('/api/orders/:id', auth as any, async (req: any, res: { status: (arg0: number) => { (): any; new(): any; send: { (arg0: unknown): void; new(): any; }; }; send: (arg0: mongoose.Document<unknown, {}, { items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps, { id: string; }, { timestamps: true; }> & Omit<{ items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps & { _id: mongoose.Types.ObjectId; } & { __v: number; }, "id"> & { id: string; }) => void; }) => {
+app.get('/orders/:id', auth as any, async (req: any, res: { status: (arg0: number) => { (): any; new(): any; send: { (arg0: unknown): void; new(): any; }; }; send: (arg0: mongoose.Document<unknown, {}, { items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps, { id: string; }, { timestamps: true; }> & Omit<{ items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps & { _id: mongoose.Types.ObjectId; } & { __v: number; }, "id"> & { id: string; }) => void; }) => {
   try {
     const order = await Order.findOne({ _id: req.params.id, user: req.user._id });
     if (!order) return res.status(404).send({ message: 'Order not found' });
@@ -639,7 +639,7 @@ app.get('/api/orders/:id', auth as any, async (req: any, res: { status: (arg0: n
 });
 
 // User Cancel Order
-app.put('/api/orders/:id/cancel', auth as any, async (req: any, res: { status: (arg0: number) => { (): any; new(): any; send: { (arg0: unknown): void; new(): any; }; }; send: (arg0: mongoose.Document<unknown, {}, { items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps, { id: string; }, { timestamps: true; }> & Omit<{ items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps & { _id: mongoose.Types.ObjectId; } & { __v: number; }, "id"> & { id: string; }) => void; }) => {
+app.put('/orders/:id/cancel', auth as any, async (req: any, res: { status: (arg0: number) => { (): any; new(): any; send: { (arg0: unknown): void; new(): any; }; }; send: (arg0: mongoose.Document<unknown, {}, { items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps, { id: string; }, { timestamps: true; }> & Omit<{ items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps & { _id: mongoose.Types.ObjectId; } & { __v: number; }, "id"> & { id: string; }) => void; }) => {
   try {
     const order = await Order.findOne({ _id: req.params.id, user: req.user._id });
     if (!order) return (res as any).status(404).send();
@@ -662,7 +662,7 @@ app.put('/api/orders/:id/cancel', auth as any, async (req: any, res: { status: (
 });
 
 // Admin Update Order (Status or generic updates)
-app.put('/api/orders/:id', auth as any, owner as any, async (req: { body: { orderStatus: any; paymentStatus: any; }; params: { id: any; }; }, res: { send: (arg0: (mongoose.Document<unknown, {}, { items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps, { id: string; }, { timestamps: true; }> & Omit<{ items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps & { _id: mongoose.Types.ObjectId; } & { __v: number; }, "id"> & { id: string; }) | null) => void; status: (arg0: number) => { (): any; new(): any; send: { (arg0: unknown): void; new(): any; }; }; }) => {
+app.put('/orders/:id', auth as any, owner as any, async (req: { body: { orderStatus: any; paymentStatus: any; }; params: { id: any; }; }, res: { send: (arg0: (mongoose.Document<unknown, {}, { items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps, { id: string; }, { timestamps: true; }> & Omit<{ items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps & { _id: mongoose.Types.ObjectId; } & { __v: number; }, "id"> & { id: string; }) | null) => void; status: (arg0: number) => { (): any; new(): any; send: { (arg0: unknown): void; new(): any; }; }; }) => {
   try {
     // Allow updating status or other fields
     const { orderStatus, paymentStatus } = req.body;
@@ -679,7 +679,7 @@ app.put('/api/orders/:id', auth as any, owner as any, async (req: { body: { orde
 
 // --- ADDRESS MANAGEMENT ROUTES ---
 
-app.get('/api/users/addresses', auth as any, async (req: any, res: any) => {
+app.get('/users/addresses', auth as any, async (req: any, res: any) => {
   try {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
@@ -689,7 +689,7 @@ app.get('/api/users/addresses', auth as any, async (req: any, res: any) => {
   }
 });
 
-app.post('/api/users/addresses', auth as any, async (req: any, res: any) => {
+app.post('/users/addresses', auth as any, async (req: any, res: any) => {
   try {
     const user: any = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
@@ -706,7 +706,7 @@ app.post('/api/users/addresses', auth as any, async (req: any, res: any) => {
   }
 });
 
-app.put('/api/users/addresses/:id', auth as any, async (req: any, res: any) => {
+app.put('/users/addresses/:id', auth as any, async (req: any, res: any) => {
   try {
     const user: any = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
@@ -729,7 +729,7 @@ app.put('/api/users/addresses/:id', auth as any, async (req: any, res: any) => {
   }
 });
 
-app.delete('/api/users/addresses/:id', auth as any, async (req: any, res: any) => {
+app.delete('/users/addresses/:id', auth as any, async (req: any, res: any) => {
   try {
     const user: any = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
@@ -746,7 +746,7 @@ app.delete('/api/users/addresses/:id', auth as any, async (req: any, res: any) =
 // --- ADMIN USER MANAGEMENT ---
 
 // List Users
-app.get('/api/admin/users', auth as any, owner as any, async (req: any, res: { send: (arg0: any[]) => void; status: (arg0: number) => { (): any; new(): any; send: { (arg0: unknown): void; new(): any; }; }; }) => {
+app.get('/admin/users', auth as any, owner as any, async (req: any, res: { send: (arg0: any[]) => void; status: (arg0: number) => { (): any; new(): any; send: { (arg0: unknown): void; new(): any; }; }; }) => {
   try {
     // Aggregate users with their order counts
     const users = await User.aggregate([
@@ -779,7 +779,7 @@ app.get('/api/admin/users', auth as any, owner as any, async (req: any, res: { s
 });
 
 // Toggle User Block Status
-app.put('/api/admin/users/:id', auth as any, owner as any, async (req: { params: { id: any; }; }, res: { status: (arg0: number) => { (): any; new(): any; send: { (arg0: unknown): void; new(): any; }; }; send: (arg0: mongoose.Document<unknown, {}, { name: string; email: string; password: string; role: "user" | "owner"; isActive: boolean; phone?: string | null | undefined; } & mongoose.DefaultTimestampProps, { id: string; }, { timestamps: true; }> & Omit<{ name: string; email: string; password: string; role: "user" | "owner"; isActive: boolean; phone?: string | null | undefined; } & mongoose.DefaultTimestampProps & { _id: mongoose.Types.ObjectId; } & { __v: number; }, "id"> & { id: string; }) => void; }) => {
+app.put('/admin/users/:id', auth as any, owner as any, async (req: { params: { id: any; }; }, res: { status: (arg0: number) => { (): any; new(): any; send: { (arg0: unknown): void; new(): any; }; }; send: (arg0: mongoose.Document<unknown, {}, { name: string; email: string; password: string; role: "user" | "owner"; isActive: boolean; phone?: string | null | undefined; } & mongoose.DefaultTimestampProps, { id: string; }, { timestamps: true; }> & Omit<{ name: string; email: string; password: string; role: "user" | "owner"; isActive: boolean; phone?: string | null | undefined; } & mongoose.DefaultTimestampProps & { _id: mongoose.Types.ObjectId; } & { __v: number; }, "id"> & { id: string; }) => void; }) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).send({ message: 'User not found' });
@@ -795,7 +795,7 @@ app.put('/api/admin/users/:id', auth as any, owner as any, async (req: { params:
 });
 
 // Admin Stats
-app.get('/api/admin/stats', auth as any, owner as any, async (req: any, res: { send: (arg0: { totalOrders: number; lowStockCount: number; userCount: number; totalRevenue: any; recentOrders: (mongoose.Document<unknown, {}, { items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps, { id: string; }, { timestamps: true; }> & Omit<{ items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps & { _id: mongoose.Types.ObjectId; } & { __v: number; }, "id"> & { id: string; })[]; }) => void; }) => {
+app.get('/admin/stats', auth as any, owner as any, async (req: any, res: { send: (arg0: { totalOrders: number; lowStockCount: number; userCount: number; totalRevenue: any; recentOrders: (mongoose.Document<unknown, {}, { items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps, { id: string; }, { timestamps: true; }> & Omit<{ items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps & { _id: mongoose.Types.ObjectId; } & { __v: number; }, "id"> & { id: string; })[]; }) => void; }) => {
   const totalOrders = await Order.countDocuments();
   const lowStockCount = await Product.countDocuments({ stock: { $lt: 5 } });
   const userCount = await User.countDocuments({ role: 'user' });
@@ -811,7 +811,7 @@ app.get('/api/admin/stats', auth as any, owner as any, async (req: any, res: { s
   res.send({ totalOrders, lowStockCount, userCount, totalRevenue, recentOrders });
 });
 
-app.get('/api/home-sections', (req, res) => {
+app.get('/home-sections', (req, res) => {
   const sections = [
     {
       id: 1,
@@ -845,7 +845,7 @@ app.get('/api/home-sections', (req, res) => {
 });
 
 // --- CART ROUTES ---
-app.get('/api/cart', auth as any, async (req: any, res: any) => {
+app.get('/cart', auth as any, async (req: any, res: any) => {
   try {
     let cart = await Cart.findOne({ user: req.user._id }).populate('items.product');
     if (!cart) {
@@ -855,7 +855,7 @@ app.get('/api/cart', auth as any, async (req: any, res: any) => {
   } catch (e) { res.status(500).send(e); }
 });
 
-app.post('/api/cart/add', auth as any, async (req: any, res: any) => {
+app.post('/cart/add', auth as any, async (req: any, res: any) => {
   try {
     const { productId, quantity, size, color } = req.body;
     let cart = await Cart.findOne({ user: req.user._id });
@@ -879,7 +879,7 @@ app.post('/api/cart/add', auth as any, async (req: any, res: any) => {
   } catch (e) { res.status(500).send(e); }
 });
 
-app.post('/api/cart/update', auth as any, async (req: any, res: any) => {
+app.post('/cart/update', auth as any, async (req: any, res: any) => {
   try {
     const { itemId, quantity } = req.body;
     const cart = await Cart.findOne({ user: req.user._id });
@@ -899,7 +899,7 @@ app.post('/api/cart/update', auth as any, async (req: any, res: any) => {
   } catch (e) { res.status(500).send(e); }
 });
 
-app.delete('/api/cart/:itemId', auth as any, async (req: any, res: any) => {
+app.delete('/cart/:itemId', auth as any, async (req: any, res: any) => {
   try {
     const cart = await Cart.findOne({ user: req.user._id });
     if (!cart) return res.status(404).send();
@@ -914,7 +914,7 @@ app.delete('/api/cart/:itemId', auth as any, async (req: any, res: any) => {
 });
 
 // --- WISHLIST ROUTES ---
-app.get('/api/wishlist', auth as any, async (req: any, res: any) => {
+app.get('/wishlist', auth as any, async (req: any, res: any) => {
   try {
     let wishlist = await Wishlist.findOne({ user: req.user._id }).populate('products');
     if (!wishlist) wishlist = await Wishlist.create({ user: req.user._id, products: [] });
@@ -922,7 +922,7 @@ app.get('/api/wishlist', auth as any, async (req: any, res: any) => {
   } catch (e) { res.status(500).send(e); }
 });
 
-app.post('/api/wishlist/toggle', auth as any, async (req: any, res: any) => {
+app.post('/wishlist/toggle', auth as any, async (req: any, res: any) => {
   try {
     const { productId } = req.body;
     let wishlist = await Wishlist.findOne({ user: req.user._id });
