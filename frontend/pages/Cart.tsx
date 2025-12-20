@@ -3,7 +3,7 @@ import { useCart } from '../context/CartContext';
 import { useCurrency } from '../context/CurrencyContext'
 import { Link, useNavigate } from 'react-router-dom';
 import { FaTrash } from 'react-icons/fa';
-import { PLACEHOLDER_IMG } from '../constants';
+import { PLACEHOLDER_IMG } from '../src/constants';
 import { getImageUrl } from '../utils/imageUtils';
 import { useToast } from '../context/ToastContext';
 import { motion, AnimatePresence } from 'framer-motion';

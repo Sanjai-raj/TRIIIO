@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { useToast } from '../context/ToastContext';
-import { PLACEHOLDER_IMG } from '../constants';
+import { PLACEHOLDER_IMG } from '../src/constants';
 import { FaStar, FaRuler, FaTimes, FaCheck, FaHeart, FaRegHeart, FaEye, FaShoppingCart } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2 } from 'lucide-react';

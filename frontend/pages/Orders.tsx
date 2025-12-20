@@ -4,7 +4,7 @@ import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { Order } from '../types';
-import { PLACEHOLDER_IMG } from '../constants';
+import { PLACEHOLDER_IMG } from '../src/constants';
 import { FaChevronDown, FaChevronUp, FaBox, FaMapMarkerAlt, FaCreditCard, FaShoppingBag, FaFileInvoice, FaBan, FaTruck, FaCheck } from 'react-icons/fa';
 
 const Orders: React.FC = () => {

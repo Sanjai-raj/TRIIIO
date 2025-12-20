@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Product } from '../types';
 import api from '../services/api';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { SIZES, COLORS, CATEGORIES, PLACEHOLDER_IMG } from '../constants';
+import { SIZES, COLORS, CATEGORIES, PLACEHOLDER_IMG } from '../src/constants';
 import { FaFilter, FaChevronDown, FaTimes } from 'react-icons/fa';
 import { useWishlist } from '../context/WishlistContext';
 import { useToast } from '../context/ToastContext';

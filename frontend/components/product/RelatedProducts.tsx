@@ -3,7 +3,7 @@ import { Product } from '../../types';
 import { useCurrency } from '../../context/CurrencyContext';
 // @ts-ignore
 import { useNavigate } from 'react-router-dom';
-import { PLACEHOLDER_IMG } from '../../constants';
+import { PLACEHOLDER_IMG } from '../../src/constants';
 // @ts-ignore
 import { LazyImage } from '../LazyImage';
 import { getImageUrl } from '../../utils/imageUtils';

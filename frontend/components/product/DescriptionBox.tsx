@@ -1,5 +1,5 @@
 import React from 'react';
-import { CATEGORIES, COLORS } from '../../constants';
+import { CATEGORIES, COLORS } from '../../src/constants';
 
 interface DescriptionBoxProps {
     formData: any;

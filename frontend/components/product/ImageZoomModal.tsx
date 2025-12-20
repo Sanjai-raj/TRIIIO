@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { PLACEHOLDER_IMG } from '../../constants';
+import { PLACEHOLDER_IMG } from '../../src/constants';
 import { useState } from "react";
 import { FaTimes } from "react-icons/fa";
 

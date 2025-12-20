@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
-import { PLACEHOLDER_IMG } from '../constants';
+import { PLACEHOLDER_IMG } from '../src/constants';
 import { getImageUrl } from '../utils/imageUtils';
 import api from '../services/api';
 import { Product } from '../types';

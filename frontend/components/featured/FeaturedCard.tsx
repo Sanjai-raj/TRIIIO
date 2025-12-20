@@ -1,6 +1,6 @@
 import React from 'react';
 import { Product } from '../../types';
-import { PLACEHOLDER_IMG } from '../../constants';
+import { PLACEHOLDER_IMG } from '../../src/constants';
 // @ts-ignore
 import { useNavigate } from 'react-router-dom';
 import { useCurrency } from '../../context/CurrencyContext';

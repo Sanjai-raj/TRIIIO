@@ -8,7 +8,7 @@ import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useCurrency } from '../context/CurrencyContext';
 import toast from 'react-hot-toast';
-import { PLACEHOLDER_IMG } from '../constants';
+import { PLACEHOLDER_IMG } from '../src/constants';
 import { getImageUrl } from '../utils/imageUtils';
 
 

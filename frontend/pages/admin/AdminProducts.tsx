@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
 import { Product } from '../../types';
 import { Link } from 'react-router-dom';
-import { PLACEHOLDER_IMG } from '../../constants';
+import { PLACEHOLDER_IMG } from '../../src/constants';
 import { useCurrency } from '../../context/CurrencyContext';
 import { getImageUrl } from '../../utils/imageUtils';
 

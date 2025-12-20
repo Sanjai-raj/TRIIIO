@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaPlus, FaTimes } from 'react-icons/fa';
-import { SIZES } from '../../constants'; // Assuming SIZES is in constants, otherwise copied from ProductForm logic
+import { SIZES } from '../../src/constants'; // Assuming SIZES is in constants, otherwise copied from ProductForm logic
 
 interface Variant {
     size: string;

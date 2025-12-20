@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
 import io from 'socket.io-client';
-import { SOCKET_URL, PLACEHOLDER_IMG } from '../../src/constants';
+import { PLACEHOLDER_IMG } from '../../src/constants';
 import { FaBoxOpen, FaDollarSign, FaExclamationTriangle, FaUsers } from 'react-icons/fa';
 import { useCurrency } from '../../context/CurrencyContext';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from 'recharts';
@@ -40,7 +40,9 @@ const AdminDashboard: React.FC = () => {
     ]);
 
     // Socket.io for Real-time
-    const socket = io(SOCKET_URL);
+    const socket = io(import.meta.env.VITE_SOCKET_URL, {
+      withCredentials: true,
+    });
     socket.on('new-order', (data) => {
       setNotifications(prev => [`New Order: ${data.orderId} received!`, ...prev]);
       api.get('/admin/stats').then(res => setStats(res.data));

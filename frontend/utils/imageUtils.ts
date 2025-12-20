@@ -1,4 +1,4 @@
-import { PLACEHOLDER_IMG } from "../constants";
+import { PLACEHOLDER_IMG } from "../src/constants";
 
 export function getImageUrl(product: any): string {
     // Defensive checks

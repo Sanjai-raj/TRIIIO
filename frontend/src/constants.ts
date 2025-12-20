@@ -1,6 +1,5 @@
 // In a real app, this points to your Node server
-const HOST = window.location.hostname;
-export const SOCKET_URL = `http://${HOST}:5001`;
+// In a real app, this points to your Node server
 
 export const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 export const COLORS = ['White', 'Black', 'Navy', 'Grey', 'Olive', 'Maroon', 'Blue', 'Beige'];
