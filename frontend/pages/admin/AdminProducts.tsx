@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import api from '../../services/api';
+import { api } from '../../src/api/client';
 import { Product } from '../../types';
 import { Link } from 'react-router-dom';
 import { PLACEHOLDER_IMG } from '../../src/constants';
@@ -17,12 +17,12 @@ const AdminProducts: React.FC = () => {
   }, []);
 
   const fetchProducts = () => {
-    api.get('/products?status=all').then(res => setProducts(res.data.products || res.data));
+    api.get('/api/products?status=all').then(res => setProducts(res.data.products || res.data));
   };
 
   const handleDelete = async (id: string) => {
     if (window.confirm("Are you sure?")) {
-      await api.delete(`/products/${id}`);
+      await api.delete(`/api/products/${id}`);
       fetchProducts();
     }
   };

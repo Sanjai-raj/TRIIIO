@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { CartItem, Product } from '../types';
 import { useToast } from './ToastContext';
 import { useAuth } from './AuthContext';
-import api from '../services/api';
+import { api } from '../src/api/client';
 
 interface CartContextType {
   items: CartItem[];
@@ -26,7 +26,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Fetch Cart on Login
   useEffect(() => {
     if (user) {
-      api.get('/cart')
+      api.get('/api/cart')
         .then(res => {
           // Backend returns: { _id, user, items: [{ product, quantity, ... }] }
           // Frontend expects: items array directly?
@@ -45,7 +45,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return; // Guests cannot add to cart
 
     try {
-      const res = await api.post('/cart/add', {
+      const res = await api.post('/api/cart/add', {
         productId: product._id,
         quantity,
         size,
@@ -69,7 +69,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!item || !(item as any)._id) return; // Should have _id from backend
 
     try {
-      const res = await api.delete(`/cart/${(item as any)._id}`);
+      const res = await api.delete(`/api/cart/${(item as any)._id}`);
       setItems(res.data.items);
       showToast('Removed from cart', 'success');
     } catch (e) {
@@ -93,7 +93,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // I'll keep it simple for now as requested.
 
     try {
-      const res = await api.post('/cart/update', { itemId: (item as any)._id, quantity });
+      const res = await api.post('/api/cart/update', { itemId: (item as any)._id, quantity });
       setItems(res.data.items);
     } catch (e) {
       console.error(e);

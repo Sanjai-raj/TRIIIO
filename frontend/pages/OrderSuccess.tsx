@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { FaCheckCircle, FaArrowRight, FaTruck, FaMapMarkerAlt, FaCalendarAlt } from 'react-icons/fa';
 import { motion } from 'framer-motion';
-import api from '../services/api';
+import { api } from '../src/api/client';
 import { useCurrency } from '../context/CurrencyContext';
 import { Order } from '../types';
 
@@ -17,7 +17,7 @@ const OrderSuccess: React.FC = () => {
     useEffect(() => {
         // Fetch order details
         if (orderId) {
-            api.get(`/orders/${orderId}`)
+            api.get(`/api/orders/${orderId}`)
                 .then(res => setOrder(res.data))
                 .catch(console.error)
                 .finally(() => setLoading(false));

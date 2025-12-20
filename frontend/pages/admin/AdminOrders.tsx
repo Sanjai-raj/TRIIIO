@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import api from '../../services/api';
+import { api } from '../../src/api/client';
 import { Order } from '../../types';
 import { FaEye, FaSearch, FaFilter, FaMoneyBillWave, FaUndo } from 'react-icons/fa';
 import { useCurrency } from '../../context/CurrencyContext';
@@ -29,7 +29,7 @@ const AdminOrders: React.FC = () => {
       if (searchId) params.append('search', searchId);
       if (filterDate) params.append('date', filterDate);
 
-      const res = await api.get(`/orders?${params.toString()}`);
+      const res = await api.get(`/api/orders?${params.toString()}`);
       setOrders(res.data);
     } catch (e) {
       console.error(e);
@@ -45,7 +45,7 @@ const AdminOrders: React.FC = () => {
 
   const updateStatus = async (id: string, status: string) => {
     try {
-      await api.put(`/orders/${id}`, { orderStatus: status });
+      await api.put(`/api/orders/${id}`, { orderStatus: status });
       fetchOrders(); // Refresh to see changes
     } catch (e) {
       alert("Error updating order");
@@ -56,7 +56,7 @@ const AdminOrders: React.FC = () => {
     if (!window.confirm(`Initiate refund for Order #${order._id.slice(-6)}? This will mark it as Refunded.`)) return;
 
     try {
-      await api.put(`/orders/${order._id}`, { orderStatus: 'Refunded', paymentStatus: 'Refunded' });
+      await api.put(`/api/orders/${order._id}`, { orderStatus: 'Refunded', paymentStatus: 'Refunded' });
       alert("Refund Processed Successfully (Status Updated)");
       fetchOrders();
     } catch (e) {
@@ -160,7 +160,7 @@ const AdminOrders: React.FC = () => {
                     value={order.orderStatus}
                     onChange={(e) => updateStatus(order._id, e.target.value)}
                     className={`border rounded-sm p-1 text-xs font-bold focus:outline-none focus:border-[#008B9E] ${order.orderStatus === 'Cancelled' ? 'text-red-600 bg-red-50 border-red-200' :
-                        order.orderStatus === 'Delivered' ? 'text-green-600 bg-green-50 border-green-200' : 'text-[#008B9E]'
+                      order.orderStatus === 'Delivered' ? 'text-green-600 bg-green-50 border-green-200' : 'text-[#008B9E]'
                       }`}
                   >
                     <option value="Pending">Pending</option>

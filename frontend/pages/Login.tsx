@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api, { handleApiError } from '../services/api';
+import { api, handleApiError } from '../src/api/client';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Navigate, useLocation } from 'react-router-dom';
 import { useToast } from '../context/ToastContext';
@@ -33,7 +33,7 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const endpoint = isLogin ? '/auth/login' : '/auth/signup';
+      const endpoint = isLogin ? '/api/auth/login' : '/api/auth/signup';
       const { data } = await api.post(endpoint, formData);
       login(data);
       showToast(isLogin ? "Welcome back!" : "Account created successfully!", 'success');

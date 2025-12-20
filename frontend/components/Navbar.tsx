@@ -5,7 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { PLACEHOLDER_IMG } from '../src/constants';
 import { getImageUrl } from '../utils/imageUtils';
-import api from '../services/api';
+import { api } from '../src/api/client';
 import { Product } from '../types';
 import BrandLogo from './BrandLogo';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -63,7 +63,7 @@ const Navbar: React.FC = () => {
         const delayDebounceFn = setTimeout(async () => {
             if (searchQuery.length > 1) {
                 try {
-                    const res = await api.get(`/products?search=${searchQuery}&limit=5`);
+                    const res = await api.get(`/api/products?search=${searchQuery}&limit=5`);
                     setSearchResults(res.data.products || res.data);
                     setIsSearchOpen(true);
                 } catch (e) {

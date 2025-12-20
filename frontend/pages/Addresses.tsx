@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api, { handleApiError } from '../services/api';
+import { api, handleApiError } from '../src/api/client';
 import { Address } from '../types';
 import { useToast } from '../context/ToastContext';
 import AnimatedButton from '../components/AnimatedButton';
@@ -33,7 +33,7 @@ export default function Addresses() {
 
     const loadAddresses = async () => {
         try {
-            const { data } = await api.get('/users/addresses');
+            const { data } = await api.get('/api/users/addresses');
             setAddresses(data);
         } catch (err) {
             console.error(err);
@@ -75,10 +75,10 @@ export default function Addresses() {
 
         try {
             if (editingId) {
-                await api.put(`/users/addresses/${editingId}`, form);
+                await api.put(`/api/users/addresses/${editingId}`, form);
                 showToast("Address updated successfully", 'success');
             } else {
-                await api.post('/users/addresses', form);
+                await api.post('/api/users/addresses', form);
                 showToast("Address added successfully", 'success');
             }
 
@@ -96,7 +96,7 @@ export default function Addresses() {
     const deleteAddress = async (id: string) => {
         if (!confirm("Are you sure you want to delete this address?")) return;
         try {
-            await api.delete(`/users/addresses/${id}`);
+            await api.delete(`/api/users/addresses/${id}`);
             loadAddresses();
             showToast("Address deleted", 'success');
         } catch (e: any) {

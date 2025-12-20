@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import api from '../../services/api';
+import { api } from '../../src/api/client';
 import toast from 'react-hot-toast';
 // Layout
 import AdminLayout from '../../components/layout/AdminLayout';
@@ -38,7 +38,7 @@ const EditProduct: React.FC = () => {
     useEffect(() => {
         if (isEdit) {
             setLoading(true);
-            api.get(`/products/${id}`).then(res => {
+            api.get(`/api/products/${id}`).then(res => {
                 const p = res.data;
 
                 setFormData({
@@ -112,12 +112,12 @@ const EditProduct: React.FC = () => {
             if (isEdit) {
                 data.append('existingImages', JSON.stringify(existingImages));
 
-                await api.put(`/products/${id}`, data, {
+                await api.put(`/api/products/${id}`, data, {
                     headers: { "Content-Type": "multipart/form-data" }
                 });
                 toast.success('Product updated!');
             } else {
-                await api.post('/products', data, {
+                await api.post('/api/products', data, {
                     headers: { "Content-Type": "multipart/form-data" }
                 });
                 toast.success('Product created!');

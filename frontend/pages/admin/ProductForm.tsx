@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import api from '../../services/api';
+import { api } from '../../src/api/client';
 import { SIZES, COLORS, CATEGORIES } from '../../src/constants';
 import { FaCamera, FaTimes, FaPlus, FaTrash } from 'react-icons/fa';
 import { ProductVariant } from '../../types';
@@ -30,7 +30,7 @@ const ProductForm: React.FC = () => {
 
   useEffect(() => {
     if (isEdit) {
-      api.get(`/products/${id}`).then(res => {
+      api.get(`/api/products/${id}`).then(res => {
         const p = res.data;
 
         const priceInINR = p.price || 0;
@@ -124,13 +124,13 @@ const ProductForm: React.FC = () => {
     try {
       if (isEdit) {
         data.append("existingImages", JSON.stringify(existingImages));
-        await api.put(`/products/${id}`, data, {
+        await api.put(`/api/products/${id}`, data, {
           withCredentials: true,
           headers: { "Content-Type": "multipart/form-data" },
         });
         alert("Product updated successfully");
       } else {
-        await api.post("/products", data, {
+        await api.post("/api/products", data, {
           withCredentials: true,
           headers: { "Content-Type": "multipart/form-data" },
         });

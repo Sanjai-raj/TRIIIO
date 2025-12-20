@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Product } from '../types';
 import { useAuth } from './AuthContext';
-import api from '../services/api';
+import { api } from '../src/api/client';
 import { useToast } from './ToastContext';
 
 interface WishlistContextType {
@@ -21,7 +21,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   useEffect(() => {
     if (user) {
-      api.get('/wishlist')
+      api.get('/api/wishlist')
         .then(res => {
           // Backend: { user, products: [Product] }
           setWishlist(res.data.products || []);
@@ -35,7 +35,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const addToWishlist = async (product: Product) => {
     if (!user) return;
     try {
-      const res = await api.post('/wishlist/toggle', { productId: product._id });
+      const res = await api.post('/api/wishlist/toggle', { productId: product._id });
       setWishlist(res.data.products);
       showToast('Added to wishlist', 'success');
     } catch (e) { console.error(e); }
@@ -44,7 +44,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const removeFromWishlist = async (productId: string) => {
     if (!user) return;
     try {
-      const res = await api.post('/wishlist/toggle', { productId });
+      const res = await api.post('/api/wishlist/toggle', { productId });
       setWishlist(res.data.products);
       showToast('Removed from wishlist', 'success');
     } catch (e) { console.error(e); }

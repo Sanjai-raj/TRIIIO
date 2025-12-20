@@ -1,6 +1,7 @@
+
 import React, { useEffect, useState } from 'react';
 import { Navigate, Link } from 'react-router-dom';
-import api from '../services/api';
+import { api } from '../src/api/client';
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { Order } from '../types';
@@ -17,7 +18,7 @@ const Orders: React.FC = () => {
 
     useEffect(() => {
         if (user) {
-            api.get('/orders/myorders')
+            api.get('/api/orders/myorders')
                 .then(res => setOrders(res.data))
                 .catch(console.error)
                 .finally(() => setLoading(false));
@@ -51,7 +52,7 @@ const Orders: React.FC = () => {
 
         setCancelling(orderId);
         try {
-            await api.put(`/orders/${orderId}/cancel`);
+            await api.put(`/api/orders/${orderId}/cancel`);
             // Update local state
             setOrders(prev => prev.map(o => o._id === orderId ? { ...o, orderStatus: 'Cancelled' } : o));
             alert("Order cancelled successfully.");

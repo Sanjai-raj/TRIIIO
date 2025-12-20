@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Product } from '../types';
-import api from '../services/api';
+import { api } from '../src/api/client';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { SIZES, COLORS, CATEGORIES, PLACEHOLDER_IMG } from '../src/constants';
 import { FaFilter, FaChevronDown, FaTimes } from 'react-icons/fa';
@@ -9,32 +9,37 @@ import { useToast } from '../context/ToastContext';
 import ProductCard from '../components/ProductCard';
 import ProductSkeleton from '../components/ProductSkeleton';
 import { useCart } from '../context/CartContext';
+import { useCurrency } from '../context/CurrencyContext';
 
 const iconAnim = "transition-transform duration-200 ease-out hover:scale-110 active:scale-95";
 
 import { SortBy } from '../components/SortBy';
 
 const Shop: React.FC = () => {
-  // ... (rest of state code same as before) ...
+  const { formatPrice } = useCurrency();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { showToast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // Filters
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
+  const [selectedSize, setSelectedSize] = useState(searchParams.get('size') || '');
+  const [selectedColor, setSelectedColor] = useState(searchParams.get('color') || '');
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]); // Assuming default price range
+  const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'newest');
+
+  // Mobile filter drawer state
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
   const search = searchParams.get('search') || '';
-  const selectedSize = searchParams.get('size') || '';
-  const selectedColor = searchParams.get('color') || '';
-  const selectedCategory = searchParams.get('category') || '';
   const selectedPriceRange = searchParams.get('price') || '';
-  const sort = searchParams.get('sort') || '';
-
-  // ... (useEffect and fetches same) ...
 
   useEffect(() => {
     fetchProducts();
-  }, [searchParams]);
+  }, [searchParams, selectedCategory, selectedSize, selectedColor, priceRange, sortBy]);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -44,8 +49,9 @@ const Shop: React.FC = () => {
       if (selectedSize) apiParams.append('size', selectedSize);
       if (selectedColor) apiParams.append('color', selectedColor);
       if (selectedCategory) apiParams.append('category', selectedCategory);
-      if (sort) apiParams.append('sort', sort);
+      if (sortBy) apiParams.append('sort', sortBy);
 
+      // Handle price range mapping from UI values to API min/max
       if (selectedPriceRange) {
         if (selectedPriceRange.includes('+')) {
           const min = selectedPriceRange.replace('+', '');
@@ -57,7 +63,7 @@ const Shop: React.FC = () => {
         }
       }
 
-      const res = await api.get(`/products?${apiParams.toString()}`);
+      const res = await api.get(`/api/products?${apiParams.toString()}`);
       setProducts(res.data.products || res.data);
     } catch (err) {
       console.error(err);
@@ -102,7 +108,7 @@ const Shop: React.FC = () => {
               <FaFilter /> Filters
             </button>
             <div className="w-1/2 md:w-auto">
-              <SortBy sort={sort} onSortChange={(val) => updateFilter('sort', val)} />
+              <SortBy sort={sortBy} onSortChange={(val) => updateFilter('sort', val)} />
             </div>
           </div>
         </div>

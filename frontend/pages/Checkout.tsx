@@ -3,7 +3,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { useNavigate, Navigate, Link } from 'react-router-dom';
-import api from '../services/api';
+import { api } from '../src/api/client';
 import { useToast } from '../context/ToastContext';
 import { Address } from '../types';
 import AnimatedButton from '../components/AnimatedButton';
@@ -30,7 +30,7 @@ const Checkout: React.FC = () => {
 
   useEffect(() => {
     // Fetch addresses on mount
-    api.get('/users/addresses').then(res => {
+    api.get('/api/users/addresses').then(res => {
       setAddresses(res.data);
       // Auto select default
       const def = res.data.find((a: Address) => a.isDefault);
@@ -61,13 +61,13 @@ const Checkout: React.FC = () => {
         paymentMethod: 'Online' // Default to Online for now as per snippet, or could add payment selection back
       };
 
-      const { data: orderRes } = await api.post('/orders/create', orderData);
+      const { data: orderRes } = await api.post('/api/orders/create', orderData);
 
       // --- RAZORPAY LOGIC (Derived from previous verified code) ---
       if (orderRes.key === 'mock_key') {
         // Mock Handing
         await new Promise(r => setTimeout(r, 1000));
-        await api.post('/payment/verify', {
+        await api.post('/api/payment/verify', {
           razorpay_order_id: 'mock_rzp_order_id',
           razorpay_payment_id: 'mock_rzp_payment_id',
           razorpay_signature: 'mock_signature',
@@ -88,7 +88,7 @@ const Checkout: React.FC = () => {
         order_id: orderRes.id,
         handler: async function (response: any) {
           try {
-            await api.post('/payment/verify', {
+            await api.post('/api/payment/verify', {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
