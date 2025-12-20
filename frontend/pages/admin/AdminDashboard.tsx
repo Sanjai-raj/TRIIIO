@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { api } from '../../src/api/client';
+import { api, SOCKET_URL } from '../../src/api/client';
 import io from 'socket.io-client';
 import { PLACEHOLDER_IMG } from '../../src/constants';
 import { FaBoxOpen, FaDollarSign, FaExclamationTriangle, FaUsers } from 'react-icons/fa';
@@ -40,7 +40,7 @@ const AdminDashboard: React.FC = () => {
     ]);
 
     // Socket.io for Real-time
-    const socket = io(import.meta.env.VITE_SOCKET_URL, {
+    const socket = io(SOCKET_URL, {
       withCredentials: true,
     });
     socket.on('new-order', (data) => {

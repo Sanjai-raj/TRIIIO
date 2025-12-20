@@ -5,6 +5,8 @@ export const api = axios.create({
     withCredentials: true,
 });
 
+export const SOCKET_URL = import.meta.env.VITE_SOCKET_URL;
+
 export const handleApiError = (error: any) => {
     if (error.response && error.response.data && error.response.data.message) {
         return error.response.data.message;
