@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 // @ts-ignore
-import { PLACEHOLDER_IMG } from "../../constants";
+import { PLACEHOLDER_IMG } from "../../src/constants";
 import ImageZoomModal from "./ImageZoomModal";
 
 

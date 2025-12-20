@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
 import io from 'socket.io-client';
-import { SOCKET_URL, PLACEHOLDER_IMG } from '../../constants';
+import { SOCKET_URL, PLACEHOLDER_IMG } from '../../src/constants';
 import { FaBoxOpen, FaDollarSign, FaExclamationTriangle, FaUsers } from 'react-icons/fa';
 import { useCurrency } from '../../context/CurrencyContext';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from 'recharts';

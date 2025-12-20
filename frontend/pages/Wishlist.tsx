@@ -1,7 +1,7 @@
 import React from 'react';
 import { useWishlist } from '../context/WishlistContext';
 import { Link } from 'react-router-dom';
-import { PLACEHOLDER_IMG } from '../constants';
+import { PLACEHOLDER_IMG } from '../src/constants';
 import { getImageUrl } from '../utils/imageUtils';
 import { FaTrash, FaShoppingCart } from 'react-icons/fa';
 

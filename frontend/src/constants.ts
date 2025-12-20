@@ -1,6 +1,5 @@
 // In a real app, this points to your Node server
 const HOST = window.location.hostname;
-export const API_URL = `http://${HOST}:5001/api`;
 export const SOCKET_URL = `http://${HOST}:5001`;
 
 export const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];

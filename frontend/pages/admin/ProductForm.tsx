@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../../services/api';
-import { SIZES, COLORS, CATEGORIES } from '../../constants';
+import { SIZES, COLORS, CATEGORIES } from '../../src/constants';
 import { FaCamera, FaTimes, FaPlus, FaTrash } from 'react-icons/fa';
 import { ProductVariant } from '../../types';
 import { useCurrency } from '../../context/CurrencyContext';
