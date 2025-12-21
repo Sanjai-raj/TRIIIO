@@ -121,6 +121,8 @@ const ProductForm: React.FC = () => {
       });
     }
 
+    console.log("JWT:", localStorage.getItem("token"));
+
     try {
       if (isEdit) {
         data.append("existingImages", JSON.stringify(existingImages));

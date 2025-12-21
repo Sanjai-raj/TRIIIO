@@ -161,8 +161,10 @@ const auth = async (req: any, res: Response, next: NextFunction) => {
 };
 
 const owner = (req: Request, res: Response, next: NextFunction) => {
+  console.log(`[Auth Check] User: ${(req as any).user._id}, Role: ${(req as any).user.role}`);
   if ((req as any).user.role !== 'owner') {
-    res.status(403).send({ message: 'Access denied' });
+    console.log(`[Auth Fail] Required: owner, Found: ${(req as any).user.role}`);
+    res.status(403).send({ message: 'Access denied. Owner role required.' });
     return;
   }
   next();
