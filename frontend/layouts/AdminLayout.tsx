@@ -1,7 +1,8 @@
 import React, { useState } from "react";
+import { Outlet } from "react-router-dom";
 import Sidebar from "../components/admin/Sidebar";
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function AdminLayout({ children }: { children?: React.ReactNode }) {
     const [open, setOpen] = useState(false);
 
     return (
@@ -20,7 +21,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
             {/* Content */}
             <main className="pt-14 lg:pt-0 lg:ml-[260px] p-6 transition-all duration-300">
-                {children}
+                {children || <Outlet />}
             </main>
         </div>
     );

@@ -13,7 +13,7 @@ import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import OrderSuccess from './pages/OrderSuccess';
-import Login from './pages/Login';
+import AuthPage from './pages/AuthPage';
 import Orders from './pages/Orders';
 import Wishlist from './pages/Wishlist';
 import Addresses from './pages/Addresses';
@@ -62,7 +62,7 @@ const App: React.FC = () => {
                       <Route path="/orders" element={<Orders />} />
                       <Route path="/addresses" element={<Addresses />} />
                       <Route path="/wishlist" element={<Wishlist />} />
-                      <Route path="/login" element={<Login />} />
+                      <Route path="/login" element={<AuthPage />} />
                     </Route>
 
                     {/* New Admin Routes with Independent Layout */}

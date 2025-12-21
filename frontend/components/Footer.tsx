@@ -43,8 +43,9 @@ export default function Footer() {
                     <div className="md:text-right">
                         <h3 className="text-sm font-semibold mb-4">CONTACT</h3>
                         <ul className="space-y-3 text-sm text-white/80">
-                            <li>📍 2443 Oak Ridge Omaha, QA 45065</li>
+                            <li>📍 Tirupur, Tamil Nadu</li>
                             <li>✉️ support@triiio.com</li>
+                            <li>📞 +91 9345830932</li>
                         </ul>
                     </div>
 
