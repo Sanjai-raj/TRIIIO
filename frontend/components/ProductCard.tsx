@@ -47,7 +47,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     const imageUrl = getImageUrl(product);
 
     return (
-        <div className="group relative bg-white rounded-lg border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300">
+        <div className="group relative bg-white rounded-lg border border-gray-100 overflow-hidden transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)]">
             {/* Image */}
             <div className="relative aspect-[3/4] bg-gray-50 overflow-hidden">
                 <Link to={linkTo}>
@@ -66,12 +66,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 {/* Badges */}
                 <div className="absolute top-2 left-2 flex flex-col gap-1 pointer-events-none z-10">
                     {product.discount && product.discount > 0 && (
-                        <span className="bg-[#008B9E] text-white text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wide">
+                        <span className="bg-[#008B9E] text-white text-[15px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wide">
                             Sale
                         </span>
                     )}
                     {product.stock === 0 && (
-                        <span className="bg-gray-800 text-white text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wide">
+                        <span className="bg-gray-800 text-white text-[15px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wide">
                             Out
                         </span>
                     )}
@@ -88,12 +88,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
             {/* Content */}
             <div className="p-3 text-center">
-                <p className="text-[10px] text-gray-400 uppercase tracking-widest mb-1 truncate">
+                <p className="text-[15px] text-gray-400 uppercase tracking-widest mb-1 truncate">
                     {product.category}
                 </p>
 
                 <Link to={linkTo}>
-                    <h3 className="text-xs font-bold text-gray-900 truncate mb-1 hover:text-[#008B9E] transition-colors">
+                    <h3 className="text-[15px] font-bold text-gray-900 truncate mb-1 hover:text-[#008B9E] transition-colors">
                         {product.name}
                     </h3>
                 </Link>
@@ -101,23 +101,23 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 <div className="flex items-center justify-center gap-2 mb-3">
                     {product.discount ? (
                         <>
-                            <span className="text-[10px] text-gray-400 line-through">{formatPrice(product.price * (1 + product.discount / 100))}</span>
-                            <span className="text-xs font-bold text-[#008B9E]">{formatPrice(product.price)}</span>
+                            <span className="text-[15px] text-gray-400 line-through">{formatPrice(product.price * (1 + product.discount / 100))}</span>
+                            <span className="text-[15px] font-bold text-[#008B9E]">{formatPrice(product.price)}</span>
                         </>
                     ) : (
-                        <span className="text-xs font-bold text-[#008B9E]">{formatPrice(product.price)}</span>
+                        <span className="text-[15px] font-bold text-[#008B9E]">{formatPrice(product.price)}</span>
                     )}
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center justify-between border-t border-gray-50 pt-2 text-[10px] font-bold uppercase tracking-wider text-[#008B9E]">
-                    <Link to={linkTo} className="hover:text-[#006D7C] transition-colors px-2">
+                <div className="flex items-center justify-between border-t border-gray-50 pt-2 text-[15px] font-bold uppercase tracking-wider text-[#008B9E]">
+                    <Link to={linkTo} className="hover:text-[#006D7C] transition-all duration-200 hover:scale-[1.02] active:scale-[0.97] px-2">
                         View
                     </Link>
                     <button
                         onClick={handleAddToCart}
                         disabled={loading || product.stock === 0}
-                        className="hover:text-[#006D7C] transition-colors px-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                        className="hover:text-[#006D7C] transition-all duration-200 hover:scale-[1.02] active:scale-[0.97] px-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
                     >
                         {loading && <Loader2 size={8} className="animate-spin" />}
                         Add

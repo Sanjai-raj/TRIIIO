@@ -11,10 +11,10 @@ const Hero = () => {
             <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 opacity-50 pointer-events-none" />
 
             <div className="container mx-auto px-6 md:px-12 relative z-10 w-full">
-                <div className="flex flex-col md:flex-row items-center h-full">
+                <div className="flex flex-col items-center justify-center h-full text-center">
 
-                    {/* Left Content (45%) */}
-                    <div className="w-full md:w-[45%] flex flex-col justify-center space-y-8 md:pr-12 animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-forwards">
+                    {/* Content */}
+                    <div className="w-full max-w-4xl flex flex-col items-center justify-center space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-forwards">
 
                         {/* Subtext */}
                         <p className="text-gray-500 font-medium tracking-[0.2em] text-xs md:text-sm uppercase translate-y-2 opacity-0 animate-[fade-in_1s_ease-out_0.2s_forwards]">
@@ -22,7 +22,7 @@ const Hero = () => {
                         </p>
 
                         {/* Headline */}
-                        <h1 className="text-[#0F172A] font-sans font-black text-6xl md:text-7xl lg:text-[5.5rem] leading-[0.95] tracking-tight">
+                        <h1 className="text-[#0F172A] font-sans font-black text-6xl md:text-7xl lg:text-[7rem] leading-[0.95] tracking-tight">
                             <span className="block">ESSENTIAL</span>
                             <span className="block">COMFORT</span>
                         </h1>
@@ -38,24 +38,6 @@ const Hero = () => {
                             </button>
                         </div>
 
-                    </div>
-
-                    {/* Right Image (55%) */}
-                    <div className="w-full md:w-[55%] h-full flex items-center justify-end relative mt-12 md:mt-0 opacity-0 animate-[fade-in_1.2s_ease-out_0.4s_forwards]">
-                        <div className="relative w-full aspect-[4/5] max-w-[650px] md:translate-x-8">
-                            {/* 
-                  Using the user uploaded image /hero_cover_new.png
-                  Ensuring it doesn't touch edges (padding inside container handles horizontal, 
-                  but we'll ensure object-contain/cover looks good) 
-               */}
-                            <img
-                                src="/hero_cover_new.png"
-                                alt="Modern Fashion Model"
-                                className="w-full h-full object-contain object-center drop-shadow-2xl"
-                                // Increased contrast slightly for pop
-                                style={{ filter: 'contrast(1.05)' }}
-                            />
-                        </div>
                     </div>
 
                 </div>

@@ -17,7 +17,7 @@ export default {
             },
             animation: {
                 marquee: 'marquee 25s linear infinite',
-                fadeIn: "fadeIn 0.15s ease-out",
+                fadeIn: 'fadeIn 0.6s ease-out',
             },
             keyframes: {
                 marquee: {
@@ -25,8 +25,8 @@ export default {
                     '100%': { transform: 'translateX(-100%)' },
                 },
                 fadeIn: {
-                    from: { opacity: 0, transform: "translateY(-4px)" },
-                    to: { opacity: 1, transform: "translateY(0)" },
+                    '0%': { opacity: '0', transform: 'translateY(6px)' },
+                    '100%': { opacity: '1', transform: 'translateY(0)' },
                 },
             }
         },

@@ -1,68 +1,40 @@
 import React, { useEffect, useState } from 'react';
 import { Product } from '../types';
 import { api } from '../src/api/client';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { SIZES, COLORS, CATEGORIES, PLACEHOLDER_IMG } from '../src/constants';
+import { useSearchParams } from 'react-router-dom';
+import { SIZES, COLORS, CATEGORIES } from '../src/constants';
 import { FaFilter, FaChevronDown, FaTimes } from 'react-icons/fa';
 import { useWishlist } from '../context/WishlistContext';
 import { useToast } from '../context/ToastContext';
 import ProductCard from '../components/ProductCard';
 import ProductSkeleton from '../components/ProductSkeleton';
-import { useCart } from '../context/CartContext';
 import { useCurrency } from '../context/CurrencyContext';
-
-const iconAnim = "transition-transform duration-200 ease-out hover:scale-110 active:scale-95";
-
 import { SortBy } from '../components/SortBy';
 
 const Shop: React.FC = () => {
   const { formatPrice } = useCurrency();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const { toggleWishlist, isInWishlist } = useWishlist();
   const { showToast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Filters
-  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
-  const [selectedSize, setSelectedSize] = useState(searchParams.get('size') || '');
-  const [selectedColor, setSelectedColor] = useState(searchParams.get('color') || '');
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]); // Assuming default price range
-  const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'newest');
-
-  // Mobile filter drawer state
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  // State
   const [showFilters, setShowFilters] = useState(false);
-
   const search = searchParams.get('search') || '';
+  const selectedCategory = searchParams.get('category') || '';
+  const selectedSize = searchParams.get('size') || '';
+  const selectedColor = searchParams.get('color') || '';
+  const sortBy = searchParams.get('sort') || 'newest';
   const selectedPriceRange = searchParams.get('price') || '';
 
   useEffect(() => {
     fetchProducts();
-  }, [searchParams, selectedCategory, selectedSize, selectedColor, priceRange, sortBy]);
+  }, [searchParams]);
 
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const apiParams = new URLSearchParams();
-      if (search) apiParams.append('search', search);
-      if (selectedSize) apiParams.append('size', selectedSize);
-      if (selectedColor) apiParams.append('color', selectedColor);
-      if (selectedCategory) apiParams.append('category', selectedCategory);
-      if (sortBy) apiParams.append('sort', sortBy);
-
-      // Handle price range mapping from UI values to API min/max
-      if (selectedPriceRange) {
-        if (selectedPriceRange.includes('+')) {
-          const min = selectedPriceRange.replace('+', '');
-          apiParams.append('minPrice', min);
-        } else {
-          const [min, max] = selectedPriceRange.split('-');
-          if (min) apiParams.append('minPrice', min);
-          if (max) apiParams.append('maxPrice', max);
-        }
-      }
-
+      const apiParams = new URLSearchParams(searchParams);
       const res = await api.get(`/products?${apiParams.toString()}`);
       setProducts(res.data.products || res.data);
     } catch (err) {
@@ -75,198 +47,160 @@ const Shop: React.FC = () => {
 
   const updateFilter = (key: string, value: string) => {
     const newParams = new URLSearchParams(searchParams);
-    if (value) {
-      newParams.set(key, value);
-    } else {
-      newParams.delete(key);
-    }
+    if (value) newParams.set(key, value);
+    else newParams.delete(key);
     setSearchParams(newParams);
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    fetchProducts();
-  };
-
   return (
-    <div className="container mx-auto px-4 md:px-6 py-8 md:py-12 min-h-screen">
+    // Changed "container mx-auto" to "w-full" and used px-4 for consistent side padding
+    <div className="w-full px-4 md:px-8 py-6 min-h-screen bg-white">
 
-      <div className="mb-8 md:mb-12">
-        <h1 className="text-3xl md:text-5xl font-serif font-black mb-4 tracking-tight text-gray-900">
+      {/* Header Section */}
+      <header className="mb-8">
+        <h1 className="text-4xl md:text-5xl font-serif font-extrabold tracking-tight text-gray-900 mb-2">
           The Collection
         </h1>
-        <div className="flex flex-col md:flex-row justify-between items-end gap-6 border-b border-gray-100 pb-6">
-          <p className="text-xs uppercase tracking-widest text-gray-500 font-medium">
-            Discover {products.length} premium items
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 border-b border-gray-100 pb-4">
+          <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-gray-400 font-bold">
+            Discover {products.length} Premium Items
           </p>
 
-          <div className="flex items-center gap-4 w-full md:w-auto">
+          <div className="flex items-center gap-3 w-full md:w-auto">
             <button
-              className="md:hidden flex items-center gap-2 bg-gray-100 px-4 py-3 uppercase text-xs font-bold w-1/2 justify-center hover:bg-[#008B9E] hover:text-white transition rounded-sm"
+              className="md:hidden flex items-center justify-center gap-2 bg-gray-900 text-white px-6 py-3 uppercase text-[10px] font-bold tracking-widest flex-1 rounded-sm"
               onClick={() => setShowFilters(true)}
             >
-              <FaFilter /> Filters
+              <FaFilter size={10} /> Filters
             </button>
-            <div className="w-1/2 md:w-auto">
+            <div className="flex-1 md:w-48">
               <SortBy sort={sortBy} onSortChange={(val) => updateFilter('sort', val)} />
             </div>
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="flex flex-col md:flex-row gap-8 lg:gap-16 relative">
+      <div className="flex flex-col md:flex-row gap-10">
 
-        {/* Filters Sidebar (Mobile: Fixed, Desktop: Sticky) */}
-        <aside className={`fixed inset-0 bg-white z-[1300] p-6 overflow-auto transition-transform duration-300 md:sticky md:top-24 md:h-fit md:p-0 md:w-64 md:block md:translate-x-0 md:z-10 md:overflow-visible ${showFilters ? 'translate-x-0' : '-translate-x-full'}`}>
-          <div className="flex justify-between items-center mb-10 md:hidden">
-            <h2 className="text-xl font-black uppercase tracking-tighter">Filters</h2>
-            <button onClick={() => setShowFilters(false)}><FaTimes size={20} /></button>
+        {/* Sidebar Filters */}
+        <aside className={`
+          fixed inset-0 bg-white z-[1300] p-6 transition-transform duration-300 md:relative md:inset-auto 
+          md:translate-x-0 md:z-10 md:p-0 md:w-52 lg:w-60 shrink-0
+          ${showFilters ? 'translate-x-0' : '-translate-x-full'}
+        `}>
+          <div className="flex justify-between items-center mb-8 md:hidden border-b pb-4">
+            <h2 className="text-lg font-black uppercase tracking-tighter">Filters</h2>
+            <button onClick={() => setShowFilters(false)} className="p-2"><FaTimes size={20} /></button>
           </div>
 
-          <div className="space-y-10">
-            <div>
-              <form onSubmit={handleSearch} className="relative">
-                <input
-                  type="text"
-                  placeholder="SEARCH..."
-                  className="w-full border-b border-gray-200 py-2 pr-4 focus:outline-none focus:border-[#008B9E] text-xs tracking-widest uppercase placeholder-gray-300 font-bold bg-transparent"
-                  value={search}
-                  onChange={(e) => updateFilter('search', e.target.value)}
-                />
-                <FaChevronDown className="absolute right-0 top-3 text-gray-300 text-[10px] -rotate-90 pointer-events-none" />
-              </form>
+          <div className="space-y-10 sticky top-10">
+            {/* Search */}
+            <div className="relative group">
+              <input
+                type="text"
+                placeholder="SEARCH..."
+                className="w-full border-b border-gray-200 py-2 text-[11px] font-bold tracking-widest uppercase focus:outline-none focus:border-black transition-colors bg-transparent placeholder-gray-300"
+                value={search}
+                onChange={(e) => updateFilter('search', e.target.value)}
+              />
+              <FaChevronDown className="absolute right-0 top-3 text-gray-300 text-[10px] -rotate-90" />
             </div>
 
+            {/* Filter Sections */}
             <div className="space-y-8">
-              {/* Category */}
-              <div>
-                <div className="flex justify-between items-center mb-4 border-b border-gray-100 pb-2">
-                  <h4 className="font-bold text-xs uppercase tracking-widest text-gray-900">Category</h4>
-                  {selectedCategory && <button onClick={() => updateFilter('category', '')} className="text-[10px] text-gray-400 hover:text-[#008B9E] uppercase">Reset</button>}
-                </div>
-                <div className="space-y-2">
+              <FilterGroup title="Category" active={!!selectedCategory} onReset={() => updateFilter('category', '')}>
+                <div className="space-y-2.5">
                   {CATEGORIES.map(c => (
-                    <label key={c} className="flex items-center gap-3 cursor-pointer group">
-                      <input
-                        type="radio"
-                        name="category"
-                        checked={selectedCategory === c}
-                        onChange={() => updateFilter('category', c)}
-                        className="hidden"
-                      />
-                      <span className={`w-3 h-3 rounded-full border border-gray-300 transition ${selectedCategory === c ? 'bg-[#008B9E] border-[#008B9E]' : 'group-hover:border-[#008B9E]'}`}></span>
-                      <span className={`text-xs uppercase tracking-wide transition ${selectedCategory === c ? 'text-[#008B9E] font-bold' : 'text-gray-500 group-hover:text-gray-900'}`}>{c}</span>
-                    </label>
+                    <button
+                      key={c}
+                      onClick={() => updateFilter('category', c)}
+                      className={`flex items-center gap-3 w-full group text-left`}
+                    >
+                      <span className={`w-2.5 h-2.5 rounded-full border transition-all ${selectedCategory === c ? 'bg-black border-black scale-110' : 'border-gray-300 group-hover:border-black'}`}></span>
+                      <span className={`text-[12px] uppercase tracking-widest transition-colors ${selectedCategory === c ? 'text-black font-bold' : 'text-gray-600 group-hover:text-black'}`}>{c}</span>
+                    </button>
                   ))}
                 </div>
-              </div>
+              </FilterGroup>
 
-              {/* Price */}
-              <div>
-                <div className="flex justify-between items-center mb-4 border-b border-gray-100 pb-2">
-                  <h4 className="font-bold text-xs uppercase tracking-widest text-gray-900">Price</h4>
-                  {selectedPriceRange && <button onClick={() => updateFilter('price', '')} className="text-[10px] text-gray-400 hover:text-[#008B9E] uppercase">Reset</button>}
-                </div>
-                <div className="space-y-2">
+              <FilterGroup title="Price" active={!!selectedPriceRange} onReset={() => updateFilter('price', '')}>
+                <div className="space-y-2.5">
                   {[
-                    { label: 'Under ₹4,000', value: '0-50' },
-                    { label: '₹4,000 - ₹8,000', value: '50-100' },
-                    { label: '₹8,000 - ₹12,000', value: '100-150' },
-                    { label: 'Over ₹12,000', value: '150+' }
+                    { label: 'Under ₹4,000', value: '0-4000' },
+                    { label: '₹4,000 - ₹8,000', value: '4000-8000' },
+                    { label: 'Over ₹12,000', value: '12000+' }
                   ].map(p => (
-                    <label key={p.value} className="flex items-center gap-3 cursor-pointer group">
-                      <input
-                        type="radio"
-                        name="price"
-                        checked={selectedPriceRange === p.value}
-                        onChange={() => updateFilter('price', p.value)}
-                        className="hidden"
-                      />
-                      <span className={`w-3 h-3 rounded-full border border-gray-300 transition ${selectedPriceRange === p.value ? 'bg-[#008B9E] border-[#008B9E]' : 'group-hover:border-[#008B9E]'}`}></span>
-                      <span className={`text-xs uppercase tracking-wide transition ${selectedPriceRange === p.value ? 'text-[#008B9E] font-bold' : 'text-gray-500 group-hover:text-gray-900'}`}>{p.label}</span>
-                    </label>
+                    <button
+                      key={p.value}
+                      onClick={() => updateFilter('price', p.value)}
+                      className="flex items-center gap-3 w-full group text-left"
+                    >
+                      <span className={`w-2.5 h-2.5 rounded-full border transition-all ${selectedPriceRange === p.value ? 'bg-black border-black scale-110' : 'border-gray-300 group-hover:border-black'}`}></span>
+                      <span className={`text-[12px] uppercase tracking-widest transition-colors ${selectedPriceRange === p.value ? 'text-black font-bold' : 'text-gray-600 group-hover:text-black'}`}>{p.label}</span>
+                    </button>
                   ))}
                 </div>
-              </div>
+              </FilterGroup>
 
-              {/* Size */}
-              <div>
-                <div className="flex justify-between items-center mb-4 border-b border-gray-100 pb-2">
-                  <h4 className="font-bold text-xs uppercase tracking-widest text-gray-900">Size</h4>
-                  {selectedSize && <button onClick={() => updateFilter('size', '')} className="text-[10px] text-gray-400 hover:text-[#008B9E] uppercase">Reset</button>}
-                </div>
-                <div className="grid grid-cols-3 gap-2">
+              <FilterGroup title="Size" active={!!selectedSize} onReset={() => updateFilter('size', '')}>
+                <div className="grid grid-cols-3 gap-1.5">
                   {SIZES.map(s => (
                     <button
                       key={s}
                       onClick={() => updateFilter('size', selectedSize === s ? '' : s)}
-                      className={`h-10 text-[10px] font-bold transition-all duration-200 uppercase ${selectedSize === s
-                        ? 'bg-[#008B9E] text-white'
-                        : 'bg-gray-50 text-gray-500 hover:bg-gray-200'
-                        }`}
+                      className={`h-9 text-[12px] font-bold border transition-all uppercase ${selectedSize === s ? 'bg-black text-white border-black' : 'border-gray-100 bg-gray-50 text-gray-600 hover:border-gray-300'}`}
                     >
                       {s}
                     </button>
                   ))}
                 </div>
-              </div>
-
-              {/* Color */}
-              <div>
-                <div className="flex justify-between items-center mb-4 border-b border-gray-100 pb-2">
-                  <h4 className="font-bold text-xs uppercase tracking-widest text-gray-900">Color</h4>
-                  {selectedColor && <button onClick={() => updateFilter('color', '')} className="text-[10px] text-gray-400 hover:text-[#008B9E] uppercase">Reset</button>}
-                </div>
-                <div className="flex flex-col gap-2">
-                  {COLORS.map(c => (
-                    <button
-                      key={c}
-                      onClick={() => updateFilter('color', selectedColor === c ? '' : c)}
-                      className={`flex items-center gap-3 w-full py-2 px-1 text-xs uppercase tracking-wide transition-colors ${selectedColor === c ? 'text-[#008B9E] font-bold' : 'text-gray-500 hover:text-gray-900'
-                        }`}
-                    >
-                      <span className={`w-3 h-3 rounded-full border border-gray-200 shadow-sm`} style={{ backgroundColor: c.toLowerCase() }}></span>
-                      {c}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              </FilterGroup>
             </div>
 
             <button
-              className="md:hidden w-full bg-[#008B9E] text-white py-4 font-bold uppercase tracking-widest text-xs mt-8"
+              className="md:hidden w-full bg-black text-white py-4 font-bold uppercase tracking-[0.2em] text-[10px] mt-8 shadow-xl"
               onClick={() => setShowFilters(false)}
             >
-              View Results
+              Apply Filters
             </button>
           </div>
         </aside>
 
         {/* Product Grid */}
-        <div className="flex-1">
+        <main className="flex-1">
           {loading ? (
-            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
-              {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                <ProductSkeleton key={i} />
-              ))}
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+              {[...Array(8)].map((_, i) => <ProductSkeleton key={i} />)}
             </div>
           ) : products.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-32 border-t border-b border-gray-100">
-              <p className="text-gray-400 uppercase tracking-widest text-sm mb-6">No matching items found</p>
-              <button onClick={() => setSearchParams({})} className="bg-[#008B9E] text-white px-8 py-3 text-xs font-bold uppercase tracking-widest hover:bg-[#006D7C] transition">
-                Clear all filters
+            <div className="flex flex-col items-center justify-center py-24 bg-gray-50 rounded-lg">
+              <p className="text-gray-400 uppercase tracking-widest text-[11px] mb-4 font-bold">No items found</p>
+              <button onClick={() => setSearchParams({})} className="text-black text-[10px] font-black border-b border-black uppercase pb-1 tracking-widest">
+                Reset All Filters
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8">
               {products.map((product) => (
                 <ProductCard key={product._id} product={product} />
               ))}
             </div>
           )}
-        </div>
+        </main>
       </div>
-    </div >
+    </div>
   );
 };
+
+// Sub-component for clean filter groups
+const FilterGroup = ({ title, children, active, onReset }: any) => (
+  <div className="border-b border-gray-50 pb-6">
+    <div className="flex justify-between items-center mb-4">
+      <h4 className="font-extrabold text-[12px] uppercase tracking-[0.25em] text-black">{title}</h4>
+      {active && <button onClick={onReset} className="text-[9px] text-gray-400 uppercase font-black hover:text-black">Reset</button>}
+    </div>
+    {children}
+  </div>
+);
+
 export default Shop;
