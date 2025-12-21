@@ -62,7 +62,7 @@ const io = new Server(server, { cors: { origin: "*" } });
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:3000", "http://192.168.56.1:3000"], // Explicit origin required for credentials
+  origin: ["http://localhost:5173", "http://localhost:3000", "http://192.168.56.1:3000", "https://triiio.onrender.com"], // Explicit origin required for credentials
   credentials: true
 }) as any);
 app.use(express.json() as any);
