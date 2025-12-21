@@ -126,13 +126,19 @@ const ProductForm: React.FC = () => {
         data.append("existingImages", JSON.stringify(existingImages));
         await api.put(`/products/${id}`, data, {
           withCredentials: true,
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         });
         alert("Product updated successfully");
       } else {
         await api.post("/products", data, {
           withCredentials: true,
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         });
         alert("Product added successfully");
       }
