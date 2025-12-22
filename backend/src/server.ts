@@ -417,6 +417,19 @@ app.post('/orders/create', async (req: any, res: any) => {
   try {
     const { items, orderAmount, shippingAddress, paymentMethod, orderId, customer, products, totalAmount, orderType } = req.body;
 
+    // OPTIONAL AUTH: Manually verify token to support both Guest and Logged-in users
+    const token = req.cookies.token || req.header('Authorization')?.replace('Bearer ', '');
+    if (token) {
+      try {
+        const decoded: any = jwt.verify(token, process.env.JWT_SECRET as string);
+        if (decoded.id) {
+          (req as any).user = { _id: decoded.id };
+        }
+      } catch (e) {
+        console.log("Token invalid or expired, proceeding as guest.");
+      }
+    }
+
     const userId = (req as any).user?._id || undefined;
 
     // Strict Schema Mapping

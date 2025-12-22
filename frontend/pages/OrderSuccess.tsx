@@ -86,6 +86,7 @@ const OrderSuccess: React.FC = () => {
                                         <div>
                                             <span className="font-bold text-gray-800">{item.quantity}x</span> {item.name}
                                             <div className="text-xs text-gray-500">{item.size} / {item.color}</div>
+                                            <div className="text-[10px] text-[#008B9E] font-semibold mt-0.5">Expected delivery within 4-5 days</div>
                                         </div>
                                         <span className="font-bold text-gray-600">{formatPrice(item.price * item.quantity)}</span>
                                     </div>

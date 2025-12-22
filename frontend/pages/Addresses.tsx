@@ -27,6 +27,8 @@ export default function Addresses() {
     // Edit Mode State
     const [editingId, setEditingId] = useState<string | null>(null);
 
+    const [showForm, setShowForm] = useState(false);
+
     useEffect(() => {
         loadAddresses();
     }, []);
@@ -84,6 +86,7 @@ export default function Addresses() {
 
             setForm(initialForm);
             setEditingId(null);
+            setShowForm(false);
             setResults([]);
             setSearch("");
             setError("");
@@ -107,142 +110,30 @@ export default function Addresses() {
     const startEdit = (addr: Address) => {
         setForm(addr);
         setEditingId(addr._id || null);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setShowForm(true);
+        // Scroll to form if needed, but since it's below, maybe scroll to bottom?
+        setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 100);
     };
 
     const cancelEdit = () => {
         setForm(initialForm);
         setEditingId(null);
+        setShowForm(false);
         setError("");
     };
 
     return (
         <div className="max-w-5xl mx-auto p-6 min-h-screen">
             <h2 className="text-2xl font-bold mb-6 text-gray-800">
-                {editingId ? 'Edit Address' : 'Add New Address'}
+                My Addresses
             </h2>
 
-            {/* OPTIONAL SEARCH */}
-            <div className="mb-6 relative">
-                <input
-                    value={search}
-                    onChange={(e) => searchAddress(e.target.value)}
-                    placeholder="Search area or city (optional - OpenStreetMap)"
-                    className="w-full border p-3 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-                />
-
-                {results.length > 0 && (
-                    <div className="absolute z-10 w-full border rounded mt-2 max-h-60 overflow-auto bg-white shadow-lg">
-                        {results.map((r) => (
-                            <div
-                                key={r.place_id}
-                                className="p-3 hover:bg-gray-50 cursor-pointer text-sm border-b border-gray-50 text-gray-700"
-                                onClick={() => selectAddress(r)}
-                            >
-                                {r.display_name}
-                            </div>
-                        ))}
+            {/* SAVED ADDRESSES (moved to top) */}
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
+                {addresses.length === 0 && !showForm && (
+                    <div className="text-gray-400 italic col-span-2 text-center py-10 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                        No addresses found. Add a new one below.
                     </div>
-                )}
-            </div>
-
-            {/* FORM */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-8 rounded-lg shadow-md border border-gray-100 relative">
-                {editingId && (
-                    <div className="absolute top-4 right-4 text-xs font-bold text-teal-600 bg-teal-50 px-2 py-1 rounded">EDITING MODE</div>
-                )}
-
-                <input
-                    placeholder="Full Name *"
-                    className="input"
-                    value={form.fullName}
-                    onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-                />
-                <input
-                    placeholder="Phone Number *"
-                    className="input"
-                    value={form.phone}
-                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                    maxLength={10}
-                />
-                <input
-                    placeholder="Address Line 1 *"
-                    className="input md:col-span-2"
-                    value={form.addressLine1}
-                    onChange={(e) => setForm({ ...form, addressLine1: e.target.value })}
-                />
-                <input
-                    placeholder="Address Line 2 (Optional)"
-                    className="input md:col-span-2"
-                    value={form.addressLine2}
-                    onChange={(e) => setForm({ ...form, addressLine2: e.target.value })}
-                />
-                <input
-                    placeholder="City *"
-                    className="input"
-                    value={form.city}
-                    onChange={(e) => setForm({ ...form, city: e.target.value })}
-                />
-                <input
-                    placeholder="State *"
-                    className="input"
-                    value={form.state}
-                    onChange={(e) => setForm({ ...form, state: e.target.value })}
-                />
-                <input
-                    placeholder="Pincode *"
-                    className="input"
-                    value={form.pincode}
-                    onChange={(e) => setForm({ ...form, pincode: e.target.value })}
-                    maxLength={6}
-                />
-                <input
-                    placeholder="Country *"
-                    className="input"
-                    value={form.country}
-                    onChange={(e) => setForm({ ...form, country: e.target.value })}
-                />
-
-                <label className="flex items-center gap-2 md:col-span-2 cursor-pointer select-none">
-                    <input
-                        type="checkbox"
-                        checked={form.isDefault || false}
-                        onChange={(e) =>
-                            setForm({ ...form, isDefault: e.target.checked })
-                        }
-                        className="w-4 h-4 text-teal-600 rounded focus:ring-teal-500 border-gray-300"
-                    />
-                    <span className="text-gray-700 font-medium">Make this my default address</span>
-                </label>
-
-                {error && <p className="text-red-500 text-sm md:col-span-2 font-bold">{error}</p>}
-
-                <div className="md:col-span-2 flex gap-3">
-                    <AnimatedButton
-                        onClick={saveAddress}
-                        className="flex-1 h-12 rounded-md font-bold shadow-sm uppercase tracking-wider text-sm w-auto"
-                    >
-                        {editingId ? 'Update Address' : 'Save Address'}
-                    </AnimatedButton>
-                    {editingId && (
-                        <button
-                            onClick={cancelEdit}
-                            className="bg-gray-200 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-300 transition font-bold uppercase tracking-wider text-sm"
-                        >
-                            Cancel
-                        </button>
-                    )}
-                </div>
-            </div>
-
-            {/* SAVED ADDRESSES */}
-            <h3 className="text-xl font-bold mt-12 mb-6 text-gray-800 border-b border-gray-200 pb-2">
-                Saved Addresses
-            </h3>
-
-            <div className="grid md:grid-cols-2 gap-6">
-                {addresses.length === 0 && (
-                    <div className="text-gray-400 italic col-span-2 text-center py-10">No addresses found. Add one above!</div>
                 )}
                 {addresses.map((addr) => (
                     <div
@@ -268,13 +159,13 @@ export default function Addresses() {
 
                         <div className="flex gap-4 mt-4 text-sm font-medium pt-4 border-t border-gray-50">
                             <button
-                                className="text-blue-600 hover:text-blue-800 hover:underline"
+                                className="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
                                 onClick={() => startEdit(addr)}
                             >
                                 Edit
                             </button>
                             <button
-                                className="text-red-600 hover:text-red-800 hover:underline"
+                                className="text-red-600 hover:text-red-800 hover:underline cursor-pointer"
                                 onClick={() => addr._id && deleteAddress(addr._id)}
                             >
                                 Delete
@@ -283,6 +174,140 @@ export default function Addresses() {
                     </div>
                 ))}
             </div>
+
+            {/* ADD NEW BUTTON */}
+            {!showForm && (
+                <div className="text-center">
+                    <button
+                        onClick={() => setShowForm(true)}
+                        className="bg-[#008B9E] text-white px-8 py-3 rounded-md font-bold uppercase tracking-widest hover:bg-[#006D7C] transition shadow-lg"
+                    >
+                        + Add New Address
+                    </button>
+                </div>
+            )}
+
+            {/* FORM SECTION (Conditional) */}
+            {(showForm || editingId) && (
+                <div className="mt-8 border-t border-gray-100 pt-8 animate-fade-in-up">
+                    <h3 className="text-xl font-bold mb-6 text-gray-800">
+                        {editingId ? 'Edit Address' : 'Add New Address'}
+                    </h3>
+
+                    {/* OPTIONAL SEARCH */}
+                    <div className="mb-6 relative">
+                        <input
+                            value={search}
+                            onChange={(e) => searchAddress(e.target.value)}
+                            placeholder="Search area or city (optional - OpenStreetMap)"
+                            className="w-full border p-3 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                        />
+
+                        {results.length > 0 && (
+                            <div className="absolute z-10 w-full border rounded mt-2 max-h-60 overflow-auto bg-white shadow-lg">
+                                {results.map((r) => (
+                                    <div
+                                        key={r.place_id}
+                                        className="p-3 hover:bg-gray-50 cursor-pointer text-sm border-b border-gray-50 text-gray-700"
+                                        onClick={() => selectAddress(r)}
+                                    >
+                                        {r.display_name}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* FORM INPUTS */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-8 rounded-lg shadow-md border border-gray-100 relative">
+                        {editingId && (
+                            <div className="absolute top-4 right-4 text-xs font-bold text-teal-600 bg-teal-50 px-2 py-1 rounded">EDITING MODE</div>
+                        )}
+
+                        <input
+                            placeholder="Full Name *"
+                            className="input"
+                            value={form.fullName}
+                            onChange={(e) => setForm({ ...form, fullName: e.target.value })}
+                        />
+                        <input
+                            placeholder="Phone Number *"
+                            className="input"
+                            value={form.phone}
+                            onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                            maxLength={10}
+                        />
+                        <input
+                            placeholder="Address Line 1 *"
+                            className="input md:col-span-2"
+                            value={form.addressLine1}
+                            onChange={(e) => setForm({ ...form, addressLine1: e.target.value })}
+                        />
+                        <input
+                            placeholder="Address Line 2 (Optional)"
+                            className="input md:col-span-2"
+                            value={form.addressLine2}
+                            onChange={(e) => setForm({ ...form, addressLine2: e.target.value })}
+                        />
+                        <input
+                            placeholder="City *"
+                            className="input"
+                            value={form.city}
+                            onChange={(e) => setForm({ ...form, city: e.target.value })}
+                        />
+                        <input
+                            placeholder="State *"
+                            className="input"
+                            value={form.state}
+                            onChange={(e) => setForm({ ...form, state: e.target.value })}
+                        />
+                        <input
+                            placeholder="Pincode *"
+                            className="input"
+                            value={form.pincode}
+                            onChange={(e) => setForm({ ...form, pincode: e.target.value })}
+                            maxLength={6}
+                        />
+                        <input
+                            placeholder="Country *"
+                            className="input"
+                            value={form.country}
+                            onChange={(e) => setForm({ ...form, country: e.target.value })}
+                        />
+
+                        <label className="flex items-center gap-2 md:col-span-2 cursor-pointer select-none">
+                            <input
+                                type="checkbox"
+                                checked={form.isDefault || false}
+                                onChange={(e) =>
+                                    setForm({ ...form, isDefault: e.target.checked })
+                                }
+                                className="w-4 h-4 text-teal-600 rounded focus:ring-teal-500 border-gray-300"
+                            />
+                            <span className="text-gray-700 font-medium">Make this my default address</span>
+                        </label>
+
+                        {error && <p className="text-red-500 text-sm md:col-span-2 font-bold">{error}</p>}
+
+                        <div className="md:col-span-2 flex gap-3">
+                            <AnimatedButton
+                                onClick={saveAddress}
+                                className="flex-1 h-12 rounded-md font-bold shadow-sm uppercase tracking-wider text-sm w-auto"
+                            >
+                                {editingId ? 'Update Address' : 'Save Address'}
+                            </AnimatedButton>
+
+                            <button
+                                onClick={cancelEdit}
+                                className="bg-gray-200 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-300 transition font-bold uppercase tracking-wider text-sm"
+                            >
+                                Cancel
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

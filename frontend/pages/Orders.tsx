@@ -235,6 +235,9 @@ const Orders: React.FC = () => {
                                                                 <div className="text-xs text-gray-500 mt-1 uppercase tracking-wide">
                                                                     {item.size} <span className="mx-1">/</span> {item.color} <span className="mx-1">/</span> Qty: {item.quantity}
                                                                 </div>
+                                                                <div className="text-xs text-[#008B9E] font-semibold mt-1">
+                                                                    Expected delivery within 4-5 days
+                                                                </div>
                                                             </div>
                                                             <div className="font-bold text-sm text-[#008B9E]">
                                                                 {formatPrice(item.price)}

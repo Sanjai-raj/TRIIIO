@@ -49,9 +49,7 @@ const Login: React.FC = () => {
     <div className="max-w-md mx-auto mt-16 bg-white p-10 border border-gray-200 shadow-xl">
       <h2 className="text-3xl font-black uppercase tracking-tighter mb-2 text-center text-[#008B9E]">{isLogin ? 'Login' : 'Join Us'}</h2>
       <p className="text-xs text-center text-gray-400 mb-8 uppercase tracking-wide">
-        {isLogin
-          ? "Login using your registered mobile number or email."
-          : "Mobile number will be used for delivery updates & WhatsApp communication."}
+        
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-5">
@@ -117,7 +115,7 @@ const Login: React.FC = () => {
         </button>
       </div>
       <div className="mt-8 text-[10px] text-center text-gray-400 uppercase tracking-wider">
-        <p>Admin: owner@example.com / admin123</p>
+        
       </div>
     </div>
   );

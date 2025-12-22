@@ -23,7 +23,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             )}
 
             {/* Sidebar Drawer */}
-            <aside className={`main-sidebar bg-[#008B9E] shadow-2xl w-[250px] min-h-screen text-sm fixed left-0 top-0 bottom-0 flex flex-col z-50 transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
+            <aside className={`main-sidebar bg-[#008B9E] shadow-2xl w-[260px] min-h-screen text-sm fixed left-0 top-0 bottom-0 flex flex-col z-20 transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
                 {/* Brand Logo */}
                 <Link to="/admin" className="brand-link h-[57px] flex items-center px-4 border-b border-white/10 text-white font-bold gap-3 hover:text-white">
                     <BrandLogo className="h-6 w-auto fill-white" />

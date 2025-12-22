@@ -14,7 +14,7 @@ const AnimatedOutlet: React.FC = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="flex-grow flex flex-col"
+            className="flex-1 w-full flex flex-col"
         >
             <Outlet />
         </motion.main>
@@ -22,16 +22,11 @@ const AnimatedOutlet: React.FC = () => {
 };
 
 const PublicLayout: React.FC = () => {
-    const location = useLocation();
-    const isShop = location.pathname === '/shop';
-
     return (
-        <div className={`flex flex-col min-h-screen bg-white text-gray-900 font-sans selection:bg-[#008B9E] selection:text-white ${isShop ? 'md:pb-[350px]' : ''}`}>
+        <div className="flex flex-col min-h-screen bg-white text-gray-900 font-sans selection:bg-[#008B9E] selection:text-white">
             <Navbar />
             <AnimatedOutlet />
-            <div className={isShop ? 'md:fixed md:bottom-0 md:left-0 md:right-0 md:z-10' : ''}>
-                <Footer />
-            </div>
+            <Footer />
         </div>
     );
 };
