@@ -1,44 +1,65 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const orderSchema = new mongoose.Schema({
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    orderId: { type: String, unique: true }, // Custom Frontend ID
-    items: Array, // Keeps existing name to minimalize refactor, or alias products to it? User asked for "products". I will use items but maybe map it.
-    // Actually, user wants "products" in schema.
-    products: [
-        {
-            name: String,
-            image: String,
-            size: String,
-            color: String,
-            quantity: Number,
-            price: Number,
-        }
-    ],
-    customer: {
-        name: String,
-        phone: String,
-        address: String,
-    },
-    shippingAddress: {
-        fullName: String,
-        phone: String,
-        addressLine1: String,
-        addressLine2: String,
-        city: String,
-        state: String,
-        pincode: String,
-        country: String,
-    },
-    orderAmount: Number,
-    totalAmount: Number, // User requested this name
-    orderType: String, // Cart / Buy Now
-    paymentMethod: { type: String, default: 'Online' },
-    paymentStatus: { type: String, default: 'Pending' },
-    orderStatus: { type: String, default: 'Pending' },
-    razorpayOrderId: String,
-    razorpayPaymentId: String,
-}, { timestamps: true });
+const orderSchema = new mongoose.Schema(
+    {
+        orderId: {
+            type: String,
+            required: true,
+            unique: true,
+        },
 
-const Order = mongoose.model('Order', orderSchema);
-export default Order;
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+        },
+
+        customer: {
+            name: { type: String, required: true },
+            phone: { type: String, required: true },
+            address: { type: String, required: true },
+        },
+
+        products: [
+            {
+                name: { type: String, required: true },
+                image: String,
+                size: String,
+                color: String,
+                quantity: { type: Number, required: true },
+                price: { type: Number, required: true },
+            },
+        ],
+
+        totalAmount: {
+            type: Number,
+            required: true,
+        },
+
+        orderType: {
+            type: String,
+            enum: ["CART", "Buy Now", "Cart Order"], // Aligned with frontend values
+            default: "Cart Order",
+        },
+
+        paymentMethod: {
+            type: String,
+            default: "Online",
+        },
+
+        paymentStatus: {
+            type: String,
+            default: "Pending",
+        },
+
+        orderStatus: {
+            type: String,
+            default: "Pending",
+        },
+
+        razorpayOrderId: String,
+        razorpayPaymentId: String,
+    },
+    { timestamps: true }
+);
+
+export default mongoose.model("Order", orderSchema);

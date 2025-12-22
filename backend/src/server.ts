@@ -12,6 +12,7 @@ import Razorpay from 'razorpay';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import cookieParser from 'cookie-parser';
+import { Parser } from 'json2csv';
 
 import streamifier from 'streamifier';
 import User from './models/User.js';
@@ -40,7 +41,7 @@ if (!process.env.CLOUDINARY_CLOUD_NAME ||
 }
 
 
-const mask = s => (typeof s === 'string' ? s.slice(0, 4) + '...' : s);
+const mask = (s: any) => (typeof s === 'string' ? s.slice(0, 4) + '...' : s);
 console.log('CLOUDINARY env presence:',
   !!process.env.CLOUDINARY_CLOUD_NAME,
   !!process.env.CLOUDINARY_API_KEY,
@@ -130,7 +131,7 @@ const sendOrderEmail = async (order: any) => {
       from: '"Mens Threads" <noreply@mensthreads.com>',
       to: process.env.ADMIN_EMAIL,
       subject: `New Order #${order._id}`,
-      text: `New order of amount $${order.orderAmount} received from User ID ${order.user}. Payment Status: ${order.paymentStatus}`
+      text: `New order of amount $${order.totalAmount} received from User ID ${order.user}. Payment Status: ${order.paymentStatus}`
     });
   } catch (e) {
     console.error("Email failed", e);
@@ -418,39 +419,59 @@ app.post('/orders/create', async (req: any, res: any) => {
 
     const userId = (req as any).user?._id || undefined;
 
-    // Create DB Order
-    const orderData: any = {
+    // Strict Schema Mapping
+    // Note: 'items' from frontend (detailed with product info) maps to 'products' in new schema
+    // But frontend sends BOTH 'items' (cart items) and 'products' (whatsapp format).
+    // The user's schema expects 'products' array with { name, image, size, color, quantity, price }.
+    // We should map from the most reliable source. Frontend 'items' has all this.
+
+    const finalProducts = items.map((i: any) => ({
+      name: i.product.name || i.name,
+      image: i.product.images ? i.product.images[0]?.url : i.image,
+      size: i.selectedSize || i.size,
+      color: i.selectedColor || i.color,
+      quantity: i.quantity,
+      price: i.product.price || i.price
+    }));
+
+    const order = await Order.create({
+      orderId: `TRI-${Date.now()}`, // Generated server-side as backup, or use frontend's if robust
+      // The user requested `orderId: 'TRI-${Date.now()}'` in the prompt, forcing server-side gen.
+      // But frontend sends one. Let's stick to the prompt's explicit instruction:
+      // "orderId: `TRI-${Date.now()}`" in the create call.
+
       user: userId,
-      items: items || [],
-      products: products || [],
-      orderAmount: orderAmount || totalAmount,
+      customer: {
+        name: customer.name || shippingAddress.fullName,
+        phone: customer.phone || shippingAddress.phone,
+        address: customer.address || `${shippingAddress.addressLine1}, ${shippingAddress.city}, ${shippingAddress.state} - ${shippingAddress.pincode}`
+      },
+      products: finalProducts,
       totalAmount: totalAmount || orderAmount,
-      shippingAddress,
-      customer,
-      orderId, // Frontend ID
-      orderType,
+      orderType: orderType || "Cart Order",
       paymentMethod: paymentMethod || 'Online',
       paymentStatus: 'Pending',
       orderStatus: 'Pending'
-    };
+    });
 
-    const order = new Order(orderData);
-    await order.save();
-
-    // Populate user details for socket emission
-    // Use optional chaining for safety if user is not set
+    // Populate user if exists for consistency (though schema uses direct customer object too)
     if (userId) {
-      await order.populate('user', 'name phone email');
+      // Optional: await order.populate('user'); 
+      // Not strictly needed for the response if we return the order object, 
+      // but good for the socket emit below.
     }
+
+    // 🔕 NON-BLOCKING EMAIL (Critical Fix)
+    // We do NOT await this. We let it run in background.
+    sendOrderEmail(order).catch(err => console.error("Email failed:", err.message));
+
     io.emit('new-order', order);
 
     // COD / WhatsApp Flow
     if (paymentMethod === 'COD' || orderType) {
-      order.orderStatus = 'Confirmed';
-      await order.save();
-
-      // Notify Admin
-      sendOrderEmail(order);
+      // Update status if needed, but 'Pending' is default.
+      // If we want it Confirmed immediately:
+      await Order.findByIdAndUpdate(order._id, { orderStatus: 'Confirmed' }); // safe update
 
       return res.status(201).json({
         success: true,
@@ -463,9 +484,9 @@ app.post('/orders/create', async (req: any, res: any) => {
 
     // Razorpay Logic
     const rzpOrder = await razorpay.orders.create({
-      amount: (orderAmount || totalAmount) * 100, // paise
+      amount: order.totalAmount * 100,
       currency: "INR",
-      receipt: order.orderId ? order.orderId.toString() : order._id.toString()
+      receipt: order.orderId
     });
 
     res.status(201).json({
@@ -480,10 +501,10 @@ app.post('/orders/create', async (req: any, res: any) => {
     });
 
   } catch (err: any) {
-    console.error("ORDER CREATE ERROR:", err);
-    res.status(500).json({
+    console.error("ORDER CREATE ERROR:", err.message);
+    return res.status(500).json({
       success: false,
-      message: "Order creation failed"
+      message: err.message || "Order creation failed"
     });
   }
 });
@@ -507,7 +528,7 @@ app.post('/payment/verify', auth as any, async (req: { body: { razorpay_order_id
       }, { new: true });
 
       // Notify Admin
-      io.emit('new-order', { orderId: dbOrderId, amount: order?.orderAmount });
+      io.emit('new-order', { orderId: dbOrderId, amount: order?.totalAmount });
       sendOrderEmail(order);
 
       res.send({ status: 'success' });
@@ -520,7 +541,6 @@ app.post('/payment/verify', auth as any, async (req: { body: { razorpay_order_id
   }
 });
 
-import { Parser } from 'json2csv';
 
 // ... (existing imports)
 
@@ -552,7 +572,7 @@ app.get('/admin/stats', auth as any, owner as any, async (req: any, res: any) =>
     // Aggregation for Revenue
     const revenueAgg = await Order.aggregate([
       { $match: { paymentStatus: 'Paid' } },
-      { $group: { _id: null, total: { $sum: "$orderAmount" } } }
+      { $group: { _id: null, total: { $sum: "$totalAmount" } } }
     ]);
     // If orderAmount is faulty in older records, this might be 0, but good for new orders.
     const totalRevenue = revenueAgg.length > 0 ? revenueAgg[0].total : 0;
@@ -579,11 +599,11 @@ app.get('/orders/export/csv', auth as any, owner as any, async (req: any, res: a
       CustomerName: o.user?.name || o.customer?.name || 'Guest',
       Phone: o.user?.phone || o.customer?.phone || '',
       Email: o.user?.email || '',
-      Amount: o.orderAmount || o.totalAmount,
+      Amount: o.totalAmount,
       PaymentMethod: o.paymentMethod,
       PaymentStatus: o.paymentStatus,
       OrderStatus: o.orderStatus,
-      Items: o.items.map((i: any) => `${i.name} (x${i.quantity})`).join(', ')
+      Items: o.products ? o.products.map((i: any) => `${i.name} (x${i.quantity})`).join(', ') : ''
     }));
 
     const fields = ['OrderID', 'Date', 'CustomerName', 'Phone', 'Email', 'Amount', 'PaymentMethod', 'PaymentStatus', 'OrderStatus', 'Items'];
@@ -702,7 +722,7 @@ app.get('/orders', auth as any, owner as any, async (req: any, res: { send: (arg
 });
 
 // User My Orders Route
-app.get('/orders/myorders', auth as any, async (req: any, res: { send: (arg0: (mongoose.Document<unknown, {}, { items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps, { id: string; }, { timestamps: true; }> & Omit<{ items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps & { _id: mongoose.Types.ObjectId; } & { __v: number; }, "id"> & { id: string; })[]) => void; status: (arg0: number) => { (): any; new(): any; send: { (arg0: unknown): void; new(): any; }; }; }) => {
+app.get('/orders/myorders', auth as any, async (req: any, res: any) => {
   try {
     const orders = await Order.find({ user: req.user._id }).sort({ createdAt: -1 });
     res.send(orders);
@@ -712,7 +732,7 @@ app.get('/orders/myorders', auth as any, async (req: any, res: { send: (arg0: (m
 });
 
 // User Single Order Route (for Success Page)
-app.get('/orders/:id', auth as any, async (req: any, res: { status: (arg0: number) => { (): any; new(): any; send: { (arg0: unknown): void; new(): any; }; }; send: (arg0: mongoose.Document<unknown, {}, { items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps, { id: string; }, { timestamps: true; }> & Omit<{ items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps & { _id: mongoose.Types.ObjectId; } & { __v: number; }, "id"> & { id: string; }) => void; }) => {
+app.get('/orders/:id', auth as any, async (req: any, res: any) => {
   try {
     const order = await Order.findOne({ _id: req.params.id, user: req.user._id });
     if (!order) return res.status(404).send({ message: 'Order not found' });
@@ -723,7 +743,7 @@ app.get('/orders/:id', auth as any, async (req: any, res: { status: (arg0: numbe
 });
 
 // User Cancel Order
-app.put('/orders/:id/cancel', auth as any, async (req: any, res: { status: (arg0: number) => { (): any; new(): any; send: { (arg0: unknown): void; new(): any; }; }; send: (arg0: mongoose.Document<unknown, {}, { items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps, { id: string; }, { timestamps: true; }> & Omit<{ items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps & { _id: mongoose.Types.ObjectId; } & { __v: number; }, "id"> & { id: string; }) => void; }) => {
+app.put('/orders/:id/cancel', auth as any, async (req: any, res: any) => {
   try {
     const order = await Order.findOne({ _id: req.params.id, user: req.user._id });
     if (!order) return (res as any).status(404).send();
@@ -737,7 +757,7 @@ app.put('/orders/:id/cancel', auth as any, async (req: any, res: { status: (arg0
     await order.save();
 
     // Notify admin
-    io.emit('new-order', { orderId: order._id, amount: order.orderAmount, status: 'Cancelled' });
+    io.emit('new-order', { orderId: order._id, amount: order.totalAmount, status: 'Cancelled' });
 
     res.send(order);
   } catch (e) {
@@ -746,7 +766,7 @@ app.put('/orders/:id/cancel', auth as any, async (req: any, res: { status: (arg0
 });
 
 // Admin Update Order (Status or generic updates)
-app.put('/orders/:id', auth as any, owner as any, async (req: { body: { orderStatus: any; paymentStatus: any; }; params: { id: any; }; }, res: { send: (arg0: (mongoose.Document<unknown, {}, { items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps, { id: string; }, { timestamps: true; }> & Omit<{ items: any[]; paymentMethod: string; paymentStatus: string; orderStatus: string; user?: mongoose.Types.ObjectId | null | undefined; shippingAddress?: any; orderAmount?: number | null | undefined; razorpayOrderId?: string | null | undefined; razorpayPaymentId?: string | null | undefined; } & mongoose.DefaultTimestampProps & { _id: mongoose.Types.ObjectId; } & { __v: number; }, "id"> & { id: string; }) | null) => void; status: (arg0: number) => { (): any; new(): any; send: { (arg0: unknown): void; new(): any; }; }; }) => {
+app.put('/orders/:id', auth as any, owner as any, async (req: any, res: any) => {
   try {
     // Allow updating status or other fields
     const { orderStatus, paymentStatus } = req.body;
@@ -888,7 +908,7 @@ app.get('/admin/stats', auth as any, owner as any, async (req: any, res: any) =>
   // Simple revenue aggregation
   const revenueAgg = await Order.aggregate([
     { $match: { paymentStatus: 'Paid' } },
-    { $group: { _id: null, total: { $sum: '$orderAmount' } } }
+    { $group: { _id: null, total: { $sum: '$totalAmount' } } }
   ]);
   const totalRevenue = revenueAgg[0]?.total || 0;
 
