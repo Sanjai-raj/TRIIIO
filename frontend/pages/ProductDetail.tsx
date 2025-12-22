@@ -342,7 +342,7 @@ const ProductDetail: React.FC = () => {
                             </summary>
                             <div className="text-sm text-gray-600 mt-2 leading-relaxed animate-fadeIn">
                                 <p>Delivered in 3–4 working days.</p>
-                                <p className="mt-1">Free shipping on orders over ₹999.</p>
+                                <p className="mt-1">Free shipping on all orders all over Tamil Nadu.</p>
                             </div>
                         </details>
 
@@ -358,10 +358,57 @@ const ProductDetail: React.FC = () => {
                                             <span className="font-bold text-xs">{r.user}</span>
                                             <span className="text-[10px] text-gray-400">{new Date(r.date).toLocaleDateString()}</span>
                                         </div>
+                                        <div className="flex text-yellow-400 text-[10px] mb-1">
+                                            {[...Array(5)].map((_, i) => (
+                                                <FaStar key={i} className={i < r.rating ? "text-yellow-400" : "text-gray-300"} />
+                                            ))}
+                                        </div>
                                         <p className="italic text-xs mt-1">"{r.comment}"</p>
                                     </div>
                                 ))}
-                                {(!product.reviews || product.reviews.length === 0) && <p className="italic text-gray-400">No reviews yet.</p>}
+                                {(!product.reviews || product.reviews.length === 0) && <p className="italic text-gray-400 text-xs mb-4">No reviews yet.</p>}
+
+                                {/* Add Review Form */}
+                                <div className="mt-6 pt-4 border-t border-gray-100">
+                                    <h4 className="text-xs font-bold uppercase tracking-widest mb-3">Write a Review</h4>
+                                    {user ? (
+                                        <form onSubmit={handleSubmitReview} className="space-y-3">
+                                            <div className="flex gap-1 mb-2">
+                                                {[1, 2, 3, 4, 5].map((star) => (
+                                                    <button
+                                                        key={star}
+                                                        type="button"
+                                                        onClick={() => setReviewRating(star)}
+                                                        className="focus:outline-none transition-transform hover:scale-110"
+                                                    >
+                                                        <FaStar
+                                                            className={`w-4 h-4 ${star <= reviewRating ? 'text-yellow-400' : 'text-gray-300'}`}
+                                                        />
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            <textarea
+                                                className="w-full border border-gray-200 rounded p-2 text-xs focus:ring-1 focus:ring-[#008B9E] focus:border-[#008B9E] outline-none resize-none"
+                                                rows={3}
+                                                placeholder="Share your thoughts..."
+                                                value={reviewComment}
+                                                onChange={(e) => setReviewComment(e.target.value)}
+                                                required
+                                            ></textarea>
+                                            <button
+                                                type="submit"
+                                                disabled={submittingReview}
+                                                className="bg-[#008B9E] text-white px-4 py-2 text-[10px] font-bold uppercase tracking-widest rounded hover:bg-[#007A8A] disabled:opacity-50"
+                                            >
+                                                {submittingReview ? 'Submitting...' : 'Submit Review'}
+                                            </button>
+                                        </form>
+                                    ) : (
+                                        <p className="text-xs text-gray-500">
+                                            Please <Link to="/login" className="text-[#008B9E] underline">login</Link> to write a review.
+                                        </p>
+                                    )}
+                                </div>
                             </div>
                         </details>
                     </div>

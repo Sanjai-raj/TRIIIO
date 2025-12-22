@@ -70,7 +70,7 @@ export interface CartItem {
 export interface Order {
   _id: string;
   user: User | string;
-  items: {
+  items?: {
     product: Product | string;
     name: string;
     price: number;
@@ -78,6 +78,15 @@ export interface Order {
     size: string;
     color: string;
     image?: string;
+  }[];
+  products?: {
+    name: string;
+    productId?: string;
+    image?: string;
+    size?: string;
+    color?: string;
+    quantity: number;
+    price: number;
   }[];
   shippingAddress: Address;
   orderAmount: number;

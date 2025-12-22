@@ -22,6 +22,7 @@ const orderSchema = new mongoose.Schema(
         products: [
             {
                 name: { type: String, required: true },
+                productId: String,
                 image: String,
                 size: String,
                 color: String,

@@ -209,9 +209,9 @@ const Orders: React.FC = () => {
                                                 <FaShoppingBag className="text-[#008B9E]" /> Items Ordered
                                             </h4>
                                             <div className="space-y-4">
-                                                {order.items.map((item: any, idx) => {
-                                                    // Handle both populated product objects and raw ID strings
-                                                    const productId = typeof item.product === 'string' ? item.product : item.product?._id;
+                                                {(order.products || order.items || []).map((item: any, idx) => {
+                                                    // Handle both new 'products' schema and old 'items' schema
+                                                    const productId = item.productId || (typeof item.product === 'string' ? item.product : item.product?._id);
 
                                                     return (
                                                         <div key={idx} className="flex gap-4 items-center bg-white p-3 border border-gray-100 shadow-sm rounded-sm">

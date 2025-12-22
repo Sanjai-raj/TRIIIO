@@ -239,7 +239,7 @@ const Navbar: React.FC = () => {
                         {user ? (
                             <div className="hidden md:flex items-center gap-4 relative group">
                                 <Link to="/orders" className="text-xs font-bold uppercase tracking-widest hover:text-[#008B9E] transition-colors">
-                                    Account
+                                    {user.name || 'Account'}
                                 </Link>
                                 <div className="absolute right-0 top-full pt-4 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                                     <div className="bg-white shadow-xl border border-gray-100 p-2 flex flex-col gap-1">

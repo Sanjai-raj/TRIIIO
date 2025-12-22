@@ -440,6 +440,7 @@ app.post('/orders/create', async (req: any, res: any) => {
 
     const finalProducts = items.map((i: any) => ({
       name: i.product.name || i.name,
+      productId: i.product._id || i.product,
       image: i.product.images ? i.product.images[0]?.url : i.image,
       size: i.selectedSize || i.size,
       color: i.selectedColor || i.color,
