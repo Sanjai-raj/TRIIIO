@@ -413,8 +413,6 @@ app.delete('/products/:id', auth as any, owner as any, async (req: { params: { i
 // Orders & Payment
 // Orders & Payment - PUBLIC ROUTE
 app.post('/orders/create', async (req: any, res: any) => {
-  console.log("ORDER BODY:", JSON.stringify(req.body, null, 2));
-
   try {
     const { items, orderAmount, shippingAddress, paymentMethod, orderId, customer, products, totalAmount, orderType } = req.body;
 
@@ -429,7 +427,7 @@ app.post('/orders/create', async (req: any, res: any) => {
       totalAmount: totalAmount || orderAmount,
       shippingAddress,
       customer,
-      orderId,
+      orderId, // Frontend ID
       orderType,
       paymentMethod: paymentMethod || 'Online',
       paymentStatus: 'Pending',
@@ -440,39 +438,53 @@ app.post('/orders/create', async (req: any, res: any) => {
     await order.save();
 
     // Populate user details for socket emission
-    await order.populate('user', 'name email phone');
+    // Use optional chaining for safety if user is not set
+    if (userId) {
+      await order.populate('user', 'name phone email');
+    }
     io.emit('new-order', order);
 
-    if (paymentMethod === 'COD' || orderType) { // 'orderType' presence implies the new WhatsApp flow
-      order.orderStatus = 'Confirmed'; // Or Pending? User said default Pending.
-      // But for WhatsApp, we might consider it 'Placed'
+    // COD / WhatsApp Flow
+    if (paymentMethod === 'COD' || orderType) {
+      order.orderStatus = 'Confirmed';
       await order.save();
 
-      // Notify Admin (Email)
+      // Notify Admin
       sendOrderEmail(order);
 
-      // Return structure matching new expectation OR old expectation.
-      // User asked for: res.status(201).json({ success: true, order });
-      return res.status(201).send({ success: true, order, dbOrderId: order._id });
+      return res.status(201).json({
+        success: true,
+        orderId: order.orderId,
+        dbOrderId: order._id,
+        order,
+        message: "Order placed successfully"
+      });
     }
 
-    // Razorpay Logic (Classic Flow)
+    // Razorpay Logic
     const rzpOrder = await razorpay.orders.create({
       amount: (orderAmount || totalAmount) * 100, // paise
       currency: "INR",
       receipt: order.orderId ? order.orderId.toString() : order._id.toString()
     });
 
-    res.send({
-      id: rzpOrder.id, // Razorpay ID
-      amount: rzpOrder.amount,
-      key: process.env.RAZORPAY_KEY_ID,
-      dbOrderId: order._id,
-      method: 'Online'
+    res.status(201).json({
+      success: true,
+      razorpay: {
+        id: rzpOrder.id,
+        amount: rzpOrder.amount,
+        key: process.env.RAZORPAY_KEY_ID,
+        dbOrderId: order._id,
+        method: 'Online'
+      }
     });
-  } catch (e) {
-    console.error(e);
-    res.status(500).send({ message: 'Order creation failed' });
+
+  } catch (err: any) {
+    console.error("ORDER CREATE ERROR:", err);
+    res.status(500).json({
+      success: false,
+      message: "Order creation failed"
+    });
   }
 });
 

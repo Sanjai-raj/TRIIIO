@@ -47,173 +47,131 @@ const Checkout: React.FC = () => {
     }
 
     setLoading(true);
+
+    // 1. Prepare Data
+    const frontendOrderId = generateOrderId();
+    const totalAmountVal = cartTotal > 75 ? cartTotal : cartTotal + 10;
+
+    const whatsappProducts = items.map((item) => ({
+      name: item.product.name,
+      size: item.selectedSize,
+      color: item.selectedColor,
+      quantity: item.quantity,
+      price: item.product.price,
+      image: item.product.images[0]?.url || '',
+    }));
+
+    const customerData = {
+      name: selected.fullName,
+      phone: selected.phone || user.phone || '',
+      address: `${selected.addressLine1}, ${selected.city}, ${selected.state} - ${selected.pincode}`
+    };
+
+    const orderData = {
+      orderId: frontendOrderId,
+      items: items.map(i => ({
+        product: i.product._id,
+        name: i.product.name,
+        price: i.product.price,
+        quantity: i.quantity,
+        size: i.selectedSize,
+        color: i.selectedColor,
+        image: i.product.images[0]?.url
+      })),
+      products: whatsappProducts,
+      customer: customerData,
+      shippingAddress: selected,
+      orderAmount: totalAmountVal,
+      totalAmount: totalAmountVal,
+      orderType: items.length > 1 ? "Cart Order" : "Buy Now",
+      paymentMethod: 'Online'
+    };
+
     try {
-      // 1. Prepare Data
-      const frontendOrderId = generateOrderId();
+      // 2. Attempt Backend Order Creation
+      const { data } = await api.post('/orders/create', orderData);
 
-      const whatsappProducts = items.map((item) => ({
-        name: item.product.name,
-        size: item.selectedSize,
-        color: item.selectedColor,
-        quantity: item.quantity,
-        price: item.product.price,
-        image: item.product.images[0]?.url || '',
-      }));
+      if (!data.success) {
+        throw new Error(data.message || "Server responded with failure");
+      }
 
-      const customerData = {
-        name: selected.fullName,
-        phone: selected.phone || user.phone || '',
-        address: `${selected.addressLine1}, ${selected.city}, ${selected.state} - ${selected.pincode}`
-      };
+      // 3. Handle Razorpay (Online Payment)
+      if (data.razorpay) {
+        const options = {
+          key: data.razorpay.key,
+          amount: data.razorpay.amount,
+          currency: "INR",
+          name: "TRIIIO",
+          description: "Order Payment",
+          order_id: data.razorpay.id,
+          handler: async function (response: any) {
+            try {
+              await api.post('/payment/verify', {
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                dbOrderId: data.razorpay.dbOrderId
+              });
 
-      const totalAmountVal = cartTotal > 75 ? cartTotal : cartTotal + 10;
-
-      const orderData = {
-        orderId: frontendOrderId,
-        items: items.map(i => ({
-          product: i.product._id,
-          name: i.product.name,
-          price: i.product.price,
-          quantity: i.quantity,
-          size: i.selectedSize,
-          color: i.selectedColor,
-          image: i.product.images[0]?.url
-        })),
-        products: whatsappProducts, // Helper to match backend schema request
-        customer: customerData,
-        shippingAddress: selected,
-        orderAmount: totalAmountVal,
-        totalAmount: totalAmountVal,
-        orderType: items.length > 1 ? "Cart Order" : "Buy Now",
-        paymentMethod: 'Online'
-      };
-
-      // 2. Save Order to Backend (Attempt)
-      let orderRes;
-      try {
-        const res = await api.post('/orders/create', orderData);
-        orderRes = res.data;
-      } catch (err) {
-        console.error("Backend Order Creation Failed:", err);
-        // Fallback: Open WhatsApp directly if backend fails
-        sendOrderToWhatsApp({
-          orderId: frontendOrderId,
-          address: {
-            name: selected.fullName,
-            street: selected.addressLine1 + (selected.addressLine2 ? ', ' + selected.addressLine2 : ''),
-            city: selected.city,
-            state: selected.state,
-            pincode: selected.pincode,
+              // Success: Redirect to Success Page
+              clearCart();
+              showToast("Payment successful!", 'success');
+              navigate(`/order-success/${data.razorpay.dbOrderId}`);
+            } catch (err) {
+              showToast("Payment verification failed", 'error');
+              // Optional: fallback to WhatsApp here? User didn't request explicitly for verify-fail.
+            }
           },
-          products: whatsappProducts,
-          totalAmount: totalAmountVal,
-          phone: customerData.phone,
-          orderType: orderData.orderType,
-        });
-        showToast("Order placed via WhatsApp (Server Offline)", 'success');
-        clearCart();
-        navigate('/'); // Go home or success
-        return;
-      }
-
-      // 3. Handle Mock Payment (if applicable)
-      if (orderRes.key === 'mock_key') {
-        // ... (existing mock logic)
-        await new Promise(r => setTimeout(r, 1000));
-        await api.post('/payment/verify', {
-          razorpay_order_id: 'mock_rzp_order_id',
-          razorpay_payment_id: 'mock_rzp_payment_id',
-          razorpay_signature: 'mock_signature',
-          dbOrderId: orderRes.dbOrderId
-        }).catch(e => console.error("Mock verify failed", e)); // specific catch
-
-        sendOrderToWhatsApp({
-          orderId: frontendOrderId,
-          address: {
-            name: selected.fullName,
-            street: selected.addressLine1 + (selected.addressLine2 ? ', ' + selected.addressLine2 : ''),
-            city: selected.city,
-            state: selected.state,
-            pincode: selected.pincode,
+          prefill: {
+            name: user.name,
+            email: user.email,
+            contact: user.phone || ""
           },
-          products: whatsappProducts,
-          totalAmount: totalAmountVal,
-          phone: customerData.phone,
-          orderType: orderData.orderType,
-        });
+          theme: { color: "#008B9E" }
+        };
 
-        clearCart();
-        showToast("Order Placed Successfully (Mock)!", 'success');
-        navigate(`/order-success/${orderRes.dbOrderId}`);
-        return;
-      }
-
-      // 4. Handle Razorpay Payment
-      if (!orderRes || !orderRes.amount) {
-        throw new Error("Invalid Order Response from Server");
-      }
-
-      const options = {
-        key: orderRes.key,
-        amount: orderRes.amount,
-        currency: "INR",
-        name: "TRIIIO",
-        description: "Order Payment",
-        order_id: orderRes.id,
-        handler: async function (response: any) {
-          try {
-            await api.post('/payment/verify', {
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-              dbOrderId: orderRes.dbOrderId
-            });
-
-            sendOrderToWhatsApp({
-              orderId: frontendOrderId,
-              address: {
-                name: selected.fullName,
-                street: selected.addressLine1 + (selected.addressLine2 ? ', ' + selected.addressLine2 : ''),
-                city: selected.city,
-                state: selected.state,
-                pincode: selected.pincode,
-              },
-              products: whatsappProducts,
-              totalAmount: totalAmountVal,
-              phone: customerData.phone,
-              orderType: orderData.orderType,
-            });
-
-            clearCart();
-            showToast("Payment successful!", 'success');
-            navigate(`/order-success/${orderRes.dbOrderId}`);
-          } catch (err) {
-            showToast("Payment verification failed", 'error');
-          }
-        },
-        prefill: {
-          name: user.name,
-          email: user.email,
-          contact: user.phone || ""
-        },
-        theme: {
-          color: "#008B9E"
+        if (!window.Razorpay) {
+          throw new Error("Razorpay SDK not loaded");
         }
-      };
-
-      if (!window.Razorpay) {
-        showToast("Razorpay SDK not loaded", 'error');
-        return;
+        const rzp1 = new window.Razorpay(options);
+        rzp1.open();
+        return; // Stop here, Razorpay handles the rest
       }
-      const rzp1 = new window.Razorpay(options);
-      rzp1.open();
 
-    } catch (error: any) {
-      console.error(error);
-      showToast(error.response?.data?.message || "Order processing failed", 'error');
+      // 4. Handle COD/WhatsApp Success Case (No Razorpay data returned)
+      // Fall through to WhatsApp redirect below
+
+    } catch (err) {
+      console.warn("Backend Order Creation Failed, failing over to WhatsApp:", err);
+      // Fall through to WhatsApp redirect
     } finally {
       setLoading(false);
     }
+
+    // 5. FAIL-SAFE / DEFAULT: WhatsApp Redirect
+    // This runs if:
+    // a) Backend was successful but no Razorpay (COD flow)
+    // b) Backend failed (Catch block executed)
+    // This ensures we NEVER block the user.
+
+    sendOrderToWhatsApp({
+      orderId: frontendOrderId,
+      address: {
+        name: selected.fullName,
+        street: selected.addressLine1 + (selected.addressLine2 ? ', ' + selected.addressLine2 : ''),
+        city: selected.city,
+        state: selected.state,
+        pincode: selected.pincode,
+      },
+      products: whatsappProducts,
+      totalAmount: totalAmountVal,
+      phone: customerData.phone,
+      orderType: orderData.orderType,
+    });
+
+    showToast("Order placed via WhatsApp", 'success');
+    clearCart();
+    navigate('/');
   };
 
   return (
