@@ -1,78 +1,72 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import BrandLogo from '../BrandLogo';
+import { FaChartLine, FaTshirt, FaBox, FaUsers } from 'react-icons/fa';
 
 interface SidebarProps {
-    open: boolean;
+    isOpen: boolean;
     onClose: () => void;
 }
 
-export default function Sidebar({ open, onClose }: SidebarProps) {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     const location = useLocation();
-
-    const isActive = (path: string) => location.pathname === path;
+    const isActive = (path: string) => location.pathname === path ? 'bg-white/10 text-white' : 'text-white/70 hover:text-white hover:bg-white/5';
 
     return (
         <>
-            {/* Overlay (mobile only) */}
-            {open && (
+            {/* Mobile Backdrop */}
+            {isOpen && (
                 <div
+                    className="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-sm transition-opacity"
                     onClick={onClose}
-                    className="fixed inset-0 bg-black/40 z-40 lg:hidden"
                 />
             )}
 
-            {/* Sidebar */}
-            <aside
-                className={`
-          fixed top-0 left-0 h-screen w-[260px]
-          bg-[#008c99] text-white z-50
-          transform transition-transform duration-300
-          ${open ? "translate-x-0" : "-translate-x-full"}
-          lg:translate-x-0
-        `}
-            >
-                {/* Header */}
-                <div className="h-14 flex items-center px-4 font-bold border-b border-white/20">
-                    TRIIIO ADMIN
+            {/* Sidebar Drawer */}
+            <aside className={`main-sidebar bg-[#008B9E] shadow-2xl w-[250px] min-h-screen text-sm fixed left-0 top-0 bottom-0 flex flex-col z-50 transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
+                {/* Brand Logo */}
+                <Link to="/admin" className="brand-link h-[57px] flex items-center px-4 border-b border-white/10 text-white font-bold gap-3 hover:text-white">
+                    <BrandLogo className="h-6 w-auto fill-white" />
+                    <span className="brand-text font-light tracking-wide"><span className="font-bold">TRIIIO</span> ADMIN</span>
+                </Link>
+
+                {/* Sidebar Menu */}
+                <div className="sidebar flex-1 overflow-y-auto p-2">
+                    <nav className="mt-2">
+                        <ul className="nav nav-pills nav-sidebar flex-col space-y-1" role="menu">
+                            <li className="nav-item">
+                                <Link to="/admin" className={`nav-link flex items-center gap-3 px-3 py-2 rounded-md transition duration-200 ${isActive('/admin')}`} onClick={() => window.innerWidth < 1024 && onClose()}>
+                                    <FaChartLine className="text-lg" />
+                                    <p>Dashboard</p>
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link to="/admin/products" className={`nav-link flex items-center gap-3 px-3 py-2 rounded-md transition duration-200 ${isActive('/admin/products')}`} onClick={() => window.innerWidth < 1024 && onClose()}>
+                                    <FaTshirt className="text-lg" />
+                                    <p>Products</p>
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link to="/admin/orders" className={`nav-link flex items-center gap-3 px-3 py-2 rounded-md transition duration-200 ${isActive('/admin/orders')}`} onClick={() => window.innerWidth < 1024 && onClose()}>
+                                    <FaBox className="text-lg" />
+                                    <p>Orders</p>
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link to="/admin/users" className={`nav-link flex items-center gap-3 px-3 py-2 rounded-md transition duration-200 ${isActive('/admin/users')}`} onClick={() => window.innerWidth < 1024 && onClose()}>
+                                    <FaUsers className="text-lg" />
+                                    <p>Users</p>
+                                </Link>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
-
-                {/* Menu */}
-                <nav className="flex-1 px-4 py-6 space-y-2">
-                    <Link
-                        to="/admin"
-                        onClick={onClose}
-                        className={`block px-3 py-2 rounded hover:bg-white/10 ${isActive('/admin') ? 'bg-white/20 font-semibold' : ''}`}
-                    >
-                        Dashboard
-                    </Link>
-                    <Link
-                        to="/admin/products"
-                        onClick={onClose}
-                        className={`block px-3 py-2 rounded hover:bg-white/10 ${isActive('/admin/products') ? 'bg-white/20 font-semibold' : ''}`}
-                    >
-                        Products
-                    </Link>
-                    <Link
-                        to="/admin/orders"
-                        onClick={onClose}
-                        className={`block px-3 py-2 rounded hover:bg-white/10 ${isActive('/admin/orders') ? 'bg-white/20 font-semibold' : ''}`}
-                    >
-                        Orders
-                    </Link>
-                    <Link
-                        to="/admin/users"
-                        onClick={onClose}
-                        className={`block px-3 py-2 rounded hover:bg-white/10 ${isActive('/admin/users') ? 'bg-white/20 font-semibold' : ''}`}
-                    >
-                        Users
-                    </Link>
-                </nav>
-
-                {/* Footer */}
-                <div className="px-4 py-4 border-t border-white/20 text-sm">
-                    <Link to="/" className="hover:text-gray-200">BACK TO STORE</Link>
+                <div className="p-4 border-t border-white/10">
+                    <Link to="/" className="block text-center text-xs uppercase font-bold text-white/50 hover:text-white transition">Back to Store</Link>
                 </div>
             </aside>
         </>
     );
-}
+};
+
+export default Sidebar;

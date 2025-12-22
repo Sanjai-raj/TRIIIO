@@ -12,7 +12,7 @@ const Login: React.FC = () => {
   const { user } = useAuth();
   const location = useLocation();
   const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', password: '', phone: '', phoneOrEmail: '' });
   const { login } = useAuth();
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -47,7 +47,12 @@ const Login: React.FC = () => {
   return (
 
     <div className="max-w-md mx-auto mt-16 bg-white p-10 border border-gray-200 shadow-xl">
-      <h2 className="text-3xl font-black uppercase tracking-tighter mb-8 text-center text-[#008B9E]">{isLogin ? 'Login' : 'Join Us'}</h2>
+      <h2 className="text-3xl font-black uppercase tracking-tighter mb-2 text-center text-[#008B9E]">{isLogin ? 'Login' : 'Join Us'}</h2>
+      <p className="text-xs text-center text-gray-400 mb-8 uppercase tracking-wide">
+        {isLogin
+          ? "Login using your registered mobile number or email."
+          : "Mobile number will be used for delivery updates & WhatsApp communication."}
+      </p>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {!isLogin && (
@@ -60,14 +65,39 @@ const Login: React.FC = () => {
             onChange={e => setFormData({ ...formData, name: e.target.value })}
           />
         )}
-        <input
-          type="email"
-          placeholder="EMAIL ADDRESS"
-          required
-          className="w-full border-b border-gray-300 p-3 focus:outline-none focus:border-[#008B9E] text-sm"
-          value={formData.email}
-          onChange={e => setFormData({ ...formData, email: e.target.value })}
-        />
+
+        {isLogin ? (
+          // LOGIN: Single Field
+          <input
+            type="text"
+            placeholder="Phone number or Email"
+            required
+            className="w-full border-b border-gray-300 p-3 focus:outline-none focus:border-[#008B9E] text-sm placeholder:uppercase"
+            value={formData.phoneOrEmail || formData.email || ''}
+            onChange={e => setFormData({ ...formData, phoneOrEmail: e.target.value, email: e.target.value })}
+          />
+        ) : (
+          // SIGNUP: Separate Fields
+          <>
+            <input
+              type="text"
+              placeholder="MOBILE NUMBER (10 DIGITS)"
+              required
+              pattern="[0-9]{10}"
+              title="Please enter a valid 10-digit mobile number"
+              className="w-full border-b border-gray-300 p-3 focus:outline-none focus:border-[#008B9E] text-sm"
+              value={formData.phone || ''}
+              onChange={e => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+            />
+            <input
+              type="email"
+              placeholder="EMAIL (OPTIONAL)"
+              className="w-full border-b border-gray-300 p-3 focus:outline-none focus:border-[#008B9E] text-sm"
+              value={formData.email}
+              onChange={e => setFormData({ ...formData, email: e.target.value })}
+            />
+          </>
+        )}
         <input
           type="password"
           placeholder="PASSWORD"

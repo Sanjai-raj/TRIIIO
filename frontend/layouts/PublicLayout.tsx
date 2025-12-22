@@ -22,11 +22,16 @@ const AnimatedOutlet: React.FC = () => {
 };
 
 const PublicLayout: React.FC = () => {
+    const location = useLocation();
+    const isShop = location.pathname === '/shop';
+
     return (
-        <div className="flex flex-col min-h-screen bg-white text-gray-900 font-sans selection:bg-[#008B9E] selection:text-white">
+        <div className={`flex flex-col min-h-screen bg-white text-gray-900 font-sans selection:bg-[#008B9E] selection:text-white ${isShop ? 'md:pb-[350px]' : ''}`}>
             <Navbar />
             <AnimatedOutlet />
-            <Footer />
+            <div className={isShop ? 'md:fixed md:bottom-0 md:left-0 md:right-0 md:z-10' : ''}>
+                <Footer />
+            </div>
         </div>
     );
 };

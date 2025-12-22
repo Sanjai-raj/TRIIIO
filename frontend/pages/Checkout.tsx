@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { sendOrderToWhatsApp } from '../utils/sendOrderToWhatsApp';
+import { generateOrderId } from '../utils/generateOrderId';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
@@ -46,7 +48,28 @@ const Checkout: React.FC = () => {
 
     setLoading(true);
     try {
+      // 1. Prepare Data
+      const frontendOrderId = generateOrderId();
+
+      const whatsappProducts = items.map((item) => ({
+        name: item.product.name,
+        size: item.selectedSize,
+        color: item.selectedColor,
+        quantity: item.quantity,
+        price: item.product.price,
+        image: item.product.images[0]?.url || '',
+      }));
+
+      const customerData = {
+        name: selected.fullName,
+        phone: selected.phone || user.phone || '',
+        address: `${selected.addressLine1}, ${selected.city}, ${selected.state} - ${selected.pincode}`
+      };
+
+      const totalAmountVal = cartTotal > 75 ? cartTotal : cartTotal + 10;
+
       const orderData = {
+        orderId: frontendOrderId,
         items: items.map(i => ({
           product: i.product._id,
           name: i.product.name,
@@ -56,27 +79,78 @@ const Checkout: React.FC = () => {
           color: i.selectedColor,
           image: i.product.images[0]?.url
         })),
+        products: whatsappProducts, // Helper to match backend schema request
+        customer: customerData,
         shippingAddress: selected,
-        orderAmount: cartTotal > 75 ? cartTotal : cartTotal + 10,
-        paymentMethod: 'Online' // Default to Online for now as per snippet, or could add payment selection back
+        orderAmount: totalAmountVal,
+        totalAmount: totalAmountVal,
+        orderType: items.length > 1 ? "Cart Order" : "Buy Now",
+        paymentMethod: 'Online'
       };
 
-      const { data: orderRes } = await api.post('/orders/create', orderData);
+      // 2. Save Order to Backend (Attempt)
+      let orderRes;
+      try {
+        const res = await api.post('/orders/create', orderData);
+        orderRes = res.data;
+      } catch (err) {
+        console.error("Backend Order Creation Failed:", err);
+        // Fallback: Open WhatsApp directly if backend fails
+        sendOrderToWhatsApp({
+          orderId: frontendOrderId,
+          address: {
+            name: selected.fullName,
+            street: selected.addressLine1 + (selected.addressLine2 ? ', ' + selected.addressLine2 : ''),
+            city: selected.city,
+            state: selected.state,
+            pincode: selected.pincode,
+          },
+          products: whatsappProducts,
+          totalAmount: totalAmountVal,
+          phone: customerData.phone,
+          orderType: orderData.orderType,
+        });
+        showToast("Order placed via WhatsApp (Server Offline)", 'success');
+        clearCart();
+        navigate('/'); // Go home or success
+        return;
+      }
 
-      // --- RAZORPAY LOGIC (Derived from previous verified code) ---
+      // 3. Handle Mock Payment (if applicable)
       if (orderRes.key === 'mock_key') {
-        // Mock Handing
+        // ... (existing mock logic)
         await new Promise(r => setTimeout(r, 1000));
         await api.post('/payment/verify', {
           razorpay_order_id: 'mock_rzp_order_id',
           razorpay_payment_id: 'mock_rzp_payment_id',
           razorpay_signature: 'mock_signature',
           dbOrderId: orderRes.dbOrderId
+        }).catch(e => console.error("Mock verify failed", e)); // specific catch
+
+        sendOrderToWhatsApp({
+          orderId: frontendOrderId,
+          address: {
+            name: selected.fullName,
+            street: selected.addressLine1 + (selected.addressLine2 ? ', ' + selected.addressLine2 : ''),
+            city: selected.city,
+            state: selected.state,
+            pincode: selected.pincode,
+          },
+          products: whatsappProducts,
+          totalAmount: totalAmountVal,
+          phone: customerData.phone,
+          orderType: orderData.orderType,
         });
+
         clearCart();
         showToast("Order Placed Successfully (Mock)!", 'success');
         navigate(`/order-success/${orderRes.dbOrderId}`);
         return;
+      }
+
+      // 4. Handle Razorpay Payment
+      if (!orderRes || !orderRes.amount) {
+        throw new Error("Invalid Order Response from Server");
       }
 
       const options = {
@@ -94,6 +168,22 @@ const Checkout: React.FC = () => {
               razorpay_signature: response.razorpay_signature,
               dbOrderId: orderRes.dbOrderId
             });
+
+            sendOrderToWhatsApp({
+              orderId: frontendOrderId,
+              address: {
+                name: selected.fullName,
+                street: selected.addressLine1 + (selected.addressLine2 ? ', ' + selected.addressLine2 : ''),
+                city: selected.city,
+                state: selected.state,
+                pincode: selected.pincode,
+              },
+              products: whatsappProducts,
+              totalAmount: totalAmountVal,
+              phone: customerData.phone,
+              orderType: orderData.orderType,
+            });
+
             clearCart();
             showToast("Payment successful!", 'success');
             navigate(`/order-success/${orderRes.dbOrderId}`);
@@ -120,7 +210,7 @@ const Checkout: React.FC = () => {
 
     } catch (error: any) {
       console.error(error);
-      showToast(error.response?.data?.message || "Order creation failed", 'error');
+      showToast(error.response?.data?.message || "Order processing failed", 'error');
     } finally {
       setLoading(false);
     }

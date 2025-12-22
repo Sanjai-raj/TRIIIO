@@ -65,14 +65,14 @@ const App: React.FC = () => {
                       <Route path="/login" element={<AuthPage />} />
                     </Route>
 
+
                     {/* New Admin Routes with Independent Layout */}
                     <Route element={<ProtectedRoute />}>
-                      <Route path="/admin/products/new" element={<EditProduct />} />
-                      <Route path="/admin/products/edit/:id" element={<EditProduct />} />
-
                       <Route path="/admin" element={<AdminLayout />}>
                         <Route index element={<AdminDashboard />} />
                         <Route path="products" element={<AdminProducts />} />
+                        <Route path="products/new" element={<EditProduct />} />
+                        <Route path="products/edit/:id" element={<EditProduct />} />
                         <Route path="orders" element={<AdminOrders />} />
                         <Route path="users" element={<AdminUsers />} />
                       </Route>
@@ -84,7 +84,7 @@ const App: React.FC = () => {
           </CurrencyProvider>
         </AuthProvider>
       </ToastProvider>
-    </ErrorBoundary>
+    </ErrorBoundary >
   );
 };
 

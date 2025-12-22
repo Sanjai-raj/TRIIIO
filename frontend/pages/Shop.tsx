@@ -54,7 +54,7 @@ const Shop: React.FC = () => {
 
   return (
     // Changed "container mx-auto" to "w-full" and used px-4 for consistent side padding
-    <div className="w-full px-4 md:px-8 py-6 min-h-screen bg-white">
+    <div className="w-full px-4 md:px-8 py-6 bg-white">
 
       {/* Header Section */}
       <header className="mb-8">
@@ -126,9 +126,9 @@ const Shop: React.FC = () => {
               <FilterGroup title="Price" active={!!selectedPriceRange} onReset={() => updateFilter('price', '')}>
                 <div className="space-y-2.5">
                   {[
-                    { label: 'Under ₹4,000', value: '0-4000' },
-                    { label: '₹4,000 - ₹8,000', value: '4000-8000' },
-                    { label: 'Over ₹12,000', value: '12000+' }
+                    { label: 'Under ₹300', value: '0-300' },
+                    { label: '₹300 - ₹600', value: '300-600' },
+                    { label: 'Over ₹600', value: '600+' }
                   ].map(p => (
                     <button
                       key={p.value}

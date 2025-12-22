@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../../src/api/client';
 import toast from 'react-hot-toast';
 // Layout
-import AdminLayout from '../../components/layout/AdminLayout';
+
 
 // Components
 import DescriptionBox from '../../components/product/DescriptionBox';
@@ -134,101 +134,99 @@ const EditProduct: React.FC = () => {
     if (loading && isEdit && !formData.name) return <div className="p-10 text-center">Loading...</div>;
 
     return (
-        <AdminLayout>
-            <form onSubmit={handleSubmit}>
-                <div className="flex justify-between items-center mb-6">
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-800">{isEdit ? 'Edit Product' : 'Add New Product'}</h1>
-                        <p className="text-sm text-gray-500">Manage product details, pricing, and inventory.</p>
-                    </div>
-                    <div className="flex gap-3">
-                        <button type="button" onClick={() => navigate('/admin/products')} className="px-4 py-2 border border-gray-300 rounded-sm text-sm font-bold bg-white text-gray-700 hover:bg-gray-50">
-                            Cancel
-                        </button>
-                        <button type="submit" disabled={loading} className="px-6 py-2 bg-[#008B9E] text-white rounded-sm text-sm font-bold shadow-md hover:bg-[#007A8A] disabled:opacity-50">
-                            {loading ? 'Saving...' : 'Save Product'}
-                        </button>
-                    </div>
+        <form onSubmit={handleSubmit}>
+            <div className="flex justify-between items-center mb-6">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-800">{isEdit ? 'Edit Product' : 'Add New Product'}</h1>
+                    <p className="text-sm text-gray-500">Manage product details, pricing, and inventory.</p>
                 </div>
-
-                <div className="flex flex-wrap -mx-3 pb-24 lg:pb-0"> {/* Row with padding for mobile sticky bar */}
-                    {/* Left Column: Description & Inventory */}
-                    <div className="w-full lg:w-2/3 px-3 mb-6"> {/* Col-lg-8 */}
-                        <DescriptionBox
-                            formData={formData}
-                            setFormData={setFormData}
-                            toggleArrayItem={toggleArrayItem}
-                        />
-
-                        {/* Product Images Section */}
-                        <div className="bg-white rounded-lg border p-4 mb-6 shadow-sm">
-                            <h3 className="text-sm font-semibold mb-3">Product Images</h3>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                multiple
-                                onChange={(e) => {
-                                    const files = e.target.files;
-                                    setImages(files);
-                                    if (files) {
-                                        const previews = Array.from(files).map((file) => URL.createObjectURL(file));
-                                        setPreviewImages(previews);
-                                    }
-                                }}
-                                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100"
-                            />
-                            <p className="text-xs text-gray-400 mt-2">Upload up to 5 images. First image will be used as the product thumbnail.</p>
-
-                            {/* Existing Images */}
-                            {isEdit && existingImages.length > 0 && (
-                                <div className="grid grid-cols-5 gap-3 mt-4">
-                                    {existingImages.map((img, index) => (
-                                        <div key={index} className="relative group">
-                                            <img src={img.url} className="h-24 w-full object-cover rounded border" alt="saved" />
-                                            <button type="button" onClick={() => setExistingImages(prev => prev.filter((_, i) => i !== index))} className="absolute top-1 right-1 bg-black/70 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition"><FaTrash size={10} /></button>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-
-                            {/* New Previews */}
-                            {previewImages.length > 0 && (
-                                <div className="grid grid-cols-5 gap-3 mt-4">
-                                    {previewImages.map((src, index) => (
-                                        <img key={index} src={src} className="h-24 w-full object-cover rounded border" alt="preview" />
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                        <InventoryCompact
-                            variants={variants}
-                            setVariants={setVariants}
-                            stock={formData.stock}
-                        />
-                    </div>
-
-                    {/* Right Column: Pricing & Organization */}
-                    <div className="w-full lg:w-1/3 px-3 mb-6"> {/* Col-lg-4 */}
-                        <PricingPanel
-                            formData={formData}
-                            setFormData={setFormData}
-                        />
-                        {/* Placeholder for future Organization Card or Publish Status if needed */}
-                    </div>
-                </div>
-
-                {/* Sticky Save Bar (Mobile Only) */}
-                <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 lg:hidden z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full bg-[#008B9E] text-white py-3 rounded-md text-base font-bold shadow-sm hover:bg-[#007A8A] disabled:opacity-50 min-h-[48px]"
-                    >
+                <div className="flex gap-3">
+                    <button type="button" onClick={() => navigate('/admin/products')} className="px-4 py-2 border border-gray-300 rounded-sm text-sm font-bold bg-white text-gray-700 hover:bg-gray-50">
+                        Cancel
+                    </button>
+                    <button type="submit" disabled={loading} className="px-6 py-2 bg-[#008B9E] text-white rounded-sm text-sm font-bold shadow-md hover:bg-[#007A8A] disabled:opacity-50">
                         {loading ? 'Saving...' : 'Save Product'}
                     </button>
                 </div>
-            </form>
-        </AdminLayout>
+            </div>
+
+            <div className="flex flex-wrap -mx-3 pb-24 lg:pb-0"> {/* Row with padding for mobile sticky bar */}
+                {/* Left Column: Description & Inventory */}
+                <div className="w-full lg:w-2/3 px-3 mb-6"> {/* Col-lg-8 */}
+                    <DescriptionBox
+                        formData={formData}
+                        setFormData={setFormData}
+                        toggleArrayItem={toggleArrayItem}
+                    />
+
+                    {/* Product Images Section */}
+                    <div className="bg-white rounded-lg border p-4 mb-6 shadow-sm">
+                        <h3 className="text-sm font-semibold mb-3">Product Images</h3>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            onChange={(e) => {
+                                const files = e.target.files;
+                                setImages(files);
+                                if (files) {
+                                    const previews = Array.from(files).map((file) => URL.createObjectURL(file));
+                                    setPreviewImages(previews);
+                                }
+                            }}
+                            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100"
+                        />
+                        <p className="text-xs text-gray-400 mt-2">Upload up to 5 images. First image will be used as the product thumbnail.</p>
+
+                        {/* Existing Images */}
+                        {isEdit && existingImages.length > 0 && (
+                            <div className="grid grid-cols-5 gap-3 mt-4">
+                                {existingImages.map((img, index) => (
+                                    <div key={index} className="relative group">
+                                        <img src={img.url} className="h-24 w-full object-cover rounded border" alt="saved" />
+                                        <button type="button" onClick={() => setExistingImages(prev => prev.filter((_, i) => i !== index))} className="absolute top-1 right-1 bg-black/70 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition"><FaTrash size={10} /></button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* New Previews */}
+                        {previewImages.length > 0 && (
+                            <div className="grid grid-cols-5 gap-3 mt-4">
+                                {previewImages.map((src, index) => (
+                                    <img key={index} src={src} className="h-24 w-full object-cover rounded border" alt="preview" />
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    <InventoryCompact
+                        variants={variants}
+                        setVariants={setVariants}
+                        stock={formData.stock}
+                    />
+                </div>
+
+                {/* Right Column: Pricing & Organization */}
+                <div className="w-full lg:w-1/3 px-3 mb-6"> {/* Col-lg-4 */}
+                    <PricingPanel
+                        formData={formData}
+                        setFormData={setFormData}
+                    />
+                    {/* Placeholder for future Organization Card or Publish Status if needed */}
+                </div>
+            </div>
+
+            {/* Sticky Save Bar (Mobile Only) */}
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 lg:hidden z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-[#008B9E] text-white py-3 rounded-md text-base font-bold shadow-sm hover:bg-[#007A8A] disabled:opacity-50 min-h-[48px]"
+                >
+                    {loading ? 'Saving...' : 'Save Product'}
+                </button>
+            </div>
+        </form>
     );
 };
 

@@ -6,10 +6,10 @@ export default function HomeHero() {
     const navigate = useNavigate();
 
     const MARQUEE_TEXT = [
-        "FREE SHIPPING ON ORDERS OVER $75",
+        "FREE SHIPPING ON EVERY ORDER ALL OVER TAMILNADU",
         "YOUR NEW FAVORITE FIT IS HERE",
         "ESSENTIAL COMFORT FOR EVERYDAY",
-        "FREE SHIPPING ON ORDERS OVER $75",
+        "FREE SHIPPING ON EVERY ORDER ALL OVER TAMILNADU",
         "YOUR NEW FAVORITE FIT IS HERE",
         "ESSENTIAL COMFORT FOR EVERYDAY",
     ];
