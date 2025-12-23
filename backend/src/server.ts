@@ -221,7 +221,7 @@ app.get('/products', async (req: Request, res: Response) => {
     let products = Product.find(query);
     if (sort === 'price_asc') products = products.sort({ price: 1 });
     if (sort === 'price_desc') products = products.sort({ price: -1 });
-    if (limit) products = products.limit(Number(limit));
+    // if (limit) products = products.limit(Number(limit));
 
     res.send(await products.exec() as any);
   } catch (e) {
