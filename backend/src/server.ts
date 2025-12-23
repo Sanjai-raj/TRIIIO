@@ -202,8 +202,7 @@ app.get('/products', async (req: Request, res: Response) => {
     } else if (status) {
       query.status = status;
     } else {
-
-      query.status = 'active';
+      // query.status = 'active';
     }
 
     if (search) query.name = { $regex: search as string, $options: 'i' };
