@@ -83,7 +83,8 @@ const AdminUsers: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white shadow-sm rounded-sm border border-gray-200 overflow-hidden">
+      {/* Desktop View (Table) */}
+      <div className="hidden md:block bg-white shadow-sm rounded-sm border border-gray-200 overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -162,6 +163,71 @@ const AdminUsers: React.FC = () => {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile View (Cards) */}
+      <div className="md:hidden space-y-4">
+        {loading ? (
+          <div className="text-center text-gray-400 p-8">Loading users...</div>
+        ) : filteredUsers.length === 0 ? (
+          <div className="text-center text-gray-400 p-8">No users found.</div>
+        ) : filteredUsers.map(user => (
+          <div key={user._id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+            <div className="flex justify-between items-start mb-3">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 bg-[#008B9E]/10 rounded-full flex items-center justify-center text-[#008B9E] font-bold text-sm">
+                  {user.name.charAt(0)}
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900">{user.name}</h3>
+                  <p className="text-xs text-gray-500">{user.email}</p>
+                </div>
+              </div>
+              {user.isActive ? (
+                <span className="px-2 py-1 rounded-full bg-green-100 text-green-800 text-[10px] font-bold uppercase">Active</span>
+              ) : (
+                <span className="px-2 py-1 rounded-full bg-red-100 text-red-800 text-[10px] font-bold uppercase">Blocked</span>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 mb-4 text-xs text-gray-500 border-y border-gray-50 py-3">
+              <div>
+                <span className="block text-gray-400 uppercase tracking-wider text-[10px]">Role</span>
+                <span className="font-medium text-gray-700 flex items-center gap-1">
+                  {user.role === 'owner' ? <><FaUserShield className="text-[#008B9E]" /> Admin</> : 'Customer'}
+                </span>
+              </div>
+              <div>
+                <span className="block text-gray-400 uppercase tracking-wider text-[10px]">Orders</span>
+                <span className="font-medium text-gray-700">{user.orderCount || 0}</span>
+              </div>
+              <div>
+                <span className="block text-gray-400 uppercase tracking-wider text-[10px]">Joined</span>
+                <span className="font-medium text-gray-700">{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}</span>
+              </div>
+            </div>
+
+            {user.role !== 'owner' && (
+              <div className="flex gap-2">
+                <button
+                  onClick={() => toggleBlockUser(user)}
+                  className={`flex-1 flex items-center justify-center gap-1 text-xs font-bold uppercase tracking-wide py-2 rounded-md border ${user.isActive
+                    ? 'text-yellow-600 border-yellow-200 bg-yellow-50'
+                    : 'text-green-600 border-green-200 bg-green-50'
+                    }`}
+                >
+                  {user.isActive ? <><FaBan /> Block</> : <><FaCheck /> Unblock</>}
+                </button>
+                <button
+                  onClick={() => deleteUser(user)}
+                  className="flex-1 flex items-center justify-center gap-1 text-xs font-bold uppercase tracking-wide py-2 rounded-md border text-red-600 border-red-200 bg-red-50"
+                >
+                  <FaTrash /> Delete
+                </button>
+              </div>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );
