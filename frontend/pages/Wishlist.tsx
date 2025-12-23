@@ -20,7 +20,7 @@ const Wishlist: React.FC = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
-      <h1 className="text-4xl font-serif font-black mb-10 tracking-tight text-[#008B9E]">My Wishlist</h1>
+      <h1 className="text-4xl font-sans font-black mb-10 tracking-tight text-[#008B9E]">My Wishlist</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {wishlist.map(product => (
@@ -44,7 +44,7 @@ const Wishlist: React.FC = () => {
 
             <div className="p-4 text-center">
               <Link to={`/product/${product._id}`}>
-                <h3 className="font-serif font-bold text-gray-900 mb-1">{product.name}</h3>
+                <h3 className="font-sans font-bold text-gray-900 mb-1">{product.name}</h3>
                 <p className="text-[#008B9E] font-bold text-sm mb-4">${product.price}</p>
               </Link>
 

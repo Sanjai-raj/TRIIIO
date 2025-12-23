@@ -58,7 +58,7 @@ const Shop: React.FC = () => {
 
       {/* Header Section */}
       <header className="mb-8">
-        <h1 className="text-4xl md:text-5xl font-serif font-extrabold tracking-tight text-gray-900 mb-2">
+        <h1 className="text-4xl md:text-5xl font-sans font-extrabold tracking-tight text-gray-900 mb-2">
           The Collection
         </h1>
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 border-b border-gray-100 pb-4">

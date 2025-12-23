@@ -9,7 +9,7 @@ export default function FeaturedCollections() {
 
                 {/* HEADER SECTION */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 md:mb-10 gap-6 md:gap-4">
-                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter text-gray-900 uppercase leading-none font-serif">
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter text-gray-900 uppercase leading-none font-sans">
                         Unleash Your <br /> <span className="text-[#008B9E]">Fashion Fantasy</span>
                     </h2>
 

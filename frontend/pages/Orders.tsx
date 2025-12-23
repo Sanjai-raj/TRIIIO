@@ -83,7 +83,7 @@ const Orders: React.FC = () => {
 
     return (
         <div className="max-w-5xl mx-auto px-6 py-12 min-h-screen">
-            <h1 className="text-4xl font-black uppercase tracking-tighter mb-2 text-[#008B9E] font-serif">Order History</h1>
+            <h1 className="text-4xl font-black uppercase tracking-tighter mb-2 text-[#008B9E] font-sans">Order History</h1>
             <p className="text-gray-500 text-sm mb-10">View and track your past purchases.</p>
 
             {orders.length === 0 ? (

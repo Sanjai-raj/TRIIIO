@@ -62,7 +62,7 @@ const OrderSuccess: React.FC = () => {
                                 <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2 flex items-center gap-2">
                                     <FaTruck /> Estimated Delivery
                                 </h3>
-                                <p className="font-serif font-bold text-xl text-gray-900">{deliveryDateString}</p>
+                                <p className="font-sans font-bold text-xl text-gray-900">{deliveryDateString}</p>
                             </div>
 
                             <div>

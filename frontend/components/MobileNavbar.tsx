@@ -50,7 +50,7 @@ const MobileNavbar: React.FC = () => {
             <div className="sticky top-0 z-[1000] bg-white border-b border-gray-100 shadow-sm h-16 flex items-center justify-center px-6">
                 <Link to="/" className="flex items-center gap-2 group">
                     <BrandLogo className="h-8 w-auto" />
-                    <span className="text-2xl font-serif font-black tracking-tighter text-[#008B9E]">TRIIIO</span>
+                    <span className="text-2xl font-sans font-black tracking-tighter text-[#008B9E]">TRIIIO</span>
                 </Link>
             </div>
 
