@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 // Added LogOut icon
-import { LayoutDashboard, Shirt, Package, Users, LogOut } from 'lucide-react';
+import { LayoutDashboard, Shirt, Package, Users, LogOut, Store } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import BrandLogo from '../BrandLogo';
 import { useAuth } from '../../context/AuthContext';
@@ -44,15 +44,23 @@ const AdminMobileNavbar: React.FC = () => {
     return (
         <>
             {/* Top Bar with Logout */}
-            <div className="sticky top-0 z-[1000] bg-[#008B9E] border-b border-[#007a8a] shadow-md h-16 flex items-center justify-between px-5">
-                {/* Left Side: Logo and Title */}
-                <Link to="/admin/dashboard" className="flex items-center gap-2 group">
+            <div className="sticky top-0 z-[1000] bg-[#008B9E] border-b border-[#007a8a] shadow-md h-16 flex items-center justify-between px-5 relative">
+                {/* Left Side: Store Link */}
+                <Link to="/" className="p-2 hover:bg-white/10 rounded-full transition-colors text-white" aria-label="Go to Store">
+                    <Store size={20} />
+                </Link>
+
+                {/* Center: Logo and Title (Refreshes Page) */}
+                <div
+                    onClick={() => window.location.reload()}
+                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 group cursor-pointer"
+                >
                     <BrandLogo className="h-6 w-auto brightness-0 invert" />
                     <div className="flex items-baseline gap-1">
                         <span className="text-xl font-sans font-black tracking-tighter text-white">TRIIIO</span>
                         <span className="text-[10px] font-bold text-teal-100 uppercase tracking-widest opacity-80">ADMIN</span>
                     </div>
-                </Link>
+                </div>
 
                 {/* Right Side: Logout Button */}
                 <button
