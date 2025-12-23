@@ -16,7 +16,7 @@ export const getFeaturedProducts = async (): Promise<Product[]> => {
     // I will use the logic that was working: fetching products. 
     // Actually, I can append query params.
     try {
-        const res = await api.get("/products?limit=7");
+        const res = await api.get("/products");
         // Note: If the backend actually filters by featured=true, I should use that. 
         // But the previous Home.tsx code was: api.get('/products?limit=7')
         // I'll stick to the working endpoint logic but wrap it in this service.

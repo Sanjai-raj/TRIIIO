@@ -7,25 +7,36 @@ const SIDEBAR_WIDTH = 260;
 const NAVBAR_HEIGHT = 57;
 
 export default function AdminLayout({ children }: { children?: React.ReactNode }) {
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(true);
 
     return (
-        <div className="min-h-screen bg-gray-50 relative overflow-x-hidden">
+        <div className="min-h-screen flex bg-gray-50 overflow-hidden">
 
-            {/* FIXED SIDEBAR */}
-            <Sidebar isOpen={open} onClose={() => setOpen(false)} />
-
-            {/* NAVBAR SECTION */}
-            <div className="relative z-30 ml-0 md:ml-[260px] w-full md:w-[calc(100%_-_260px)] transition-all duration-300">
-                <Navbar onToggleSidebar={() => setOpen(!open)} />
-            </div>
-
-            {/* PAGE CONTENT SECTION */}
-            <main
-                className="relative z-10 ml-0 md:ml-[260px] w-full md:w-[calc(100%_-_260px)] transition-all duration-300 p-6 min-h-[calc(100vh-57px)]"
+            {/* LEFT SIDEBAR (FIXED WIDTH, NO OVERLAP) */}
+            <aside
+                className={`hidden md:flex flex-col bg-white border-r`}
+                style={{ width: SIDEBAR_WIDTH }}
             >
-                {children || <Outlet />}
-            </main>
+                <Sidebar isOpen={open} onClose={() => setOpen(false)} />
+            </aside>
+
+            {/* RIGHT ADMIN AREA */}
+            <div className="flex-1 flex flex-col h-screen overflow-hidden">
+
+                {/* NAVBAR */}
+                <header
+                    className="sticky top-0 z-30 bg-white border-b flex-shrink-0"
+                    style={{ height: NAVBAR_HEIGHT }}
+                >
+                    <Navbar onToggleSidebar={() => setOpen(!open)} />
+                </header>
+
+                {/* PAGE CONTENT */}
+                <main className="flex-1 p-6 overflow-y-auto">
+                    {children || <Outlet />}
+                </main>
+
+            </div>
         </div>
     );
 }

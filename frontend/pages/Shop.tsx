@@ -27,6 +27,8 @@ const Shop: React.FC = () => {
   const sortBy = searchParams.get('sort') || 'newest';
   const selectedPriceRange = searchParams.get('price') || '';
 
+
+
   useEffect(() => {
     fetchProducts();
   }, [searchParams]);
@@ -35,6 +37,7 @@ const Shop: React.FC = () => {
     setLoading(true);
     try {
       const apiParams = new URLSearchParams(searchParams);
+      console.log("QUERY STRING SENT:", apiParams.toString());
       const res = await api.get(`/products?${apiParams.toString()}`);
       setProducts(res.data.products || res.data);
     } catch (err) {
