@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../../src/api/client';
 import { User } from '../../types';
-import { FaUserShield, FaBan, FaCheck, FaSearch } from 'react-icons/fa';
+import { FaUserShield, FaBan, FaCheck, FaSearch, FaTrash } from 'react-icons/fa';
 
 const AdminUsers: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -39,6 +39,23 @@ const AdminUsers: React.FC = () => {
       setUsers(prev => prev.map(u => u._id === user._id ? { ...u, isActive: !u.isActive } : u));
     } catch (e) {
       alert(`Failed to ${action} user`);
+    }
+  }
+
+
+  const deleteUser = async (user: User) => {
+    if (user.role === 'owner') {
+      alert("Cannot delete admin/owner accounts.");
+      return;
+    }
+
+    if (!window.confirm(`Are you sure you want to PERMANENTLY DELETE user ${user.name}? This action cannot be undone.`)) return;
+
+    try {
+      await api.delete(`/admin/users/${user._id}`);
+      setUsers(prev => prev.filter(u => u._id !== user._id));
+    } catch (e) {
+      alert("Failed to delete user");
     }
   };
 
@@ -122,15 +139,23 @@ const AdminUsers: React.FC = () => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   {user.role !== 'owner' && (
-                    <button
-                      onClick={() => toggleBlockUser(user)}
-                      className={`flex items-center gap-1 text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-sm border ${user.isActive
-                        ? 'text-red-500 border-red-200 hover:bg-red-50'
-                        : 'text-green-500 border-green-200 hover:bg-green-50'
-                        }`}
-                    >
-                      {user.isActive ? <><FaBan size={10} /> Block</> : <><FaCheck size={10} /> Unblock</>}
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => toggleBlockUser(user)}
+                        className={`flex items-center gap-1 text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-sm border ${user.isActive
+                          ? 'text-yellow-600 border-yellow-200 hover:bg-yellow-50'
+                          : 'text-green-500 border-green-200 hover:bg-green-50'
+                          }`}
+                      >
+                        {user.isActive ? <><FaBan size={10} /> Block</> : <><FaCheck size={10} /> Unblock</>}
+                      </button>
+                      <button
+                        onClick={() => deleteUser(user)}
+                        className="flex items-center gap-1 text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-sm border text-red-500 border-red-200 hover:bg-red-50"
+                      >
+                        <FaTrash size={10} /> Delete
+                      </button>
+                    </div>
                   )}
                 </td>
               </tr>

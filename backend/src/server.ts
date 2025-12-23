@@ -911,6 +911,20 @@ app.put('/admin/users/:id', auth as any, owner as any, async (req: any, res: any
   }
 });
 
+// Delete User
+app.delete('/admin/users/:id', auth as any, owner as any, async (req: any, res: any) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).send({ message: 'User not found' });
+    if (user.role === 'owner') return res.status(400).send({ message: 'Cannot delete admin' });
+
+    await user.deleteOne();
+    res.send({ message: 'User deleted' });
+  } catch (e) {
+    res.status(500).send(e);
+  }
+});
+
 // Admin Stats
 app.get('/admin/stats', auth as any, owner as any, async (req: any, res: any) => {
   const totalOrders = await Order.countDocuments();
