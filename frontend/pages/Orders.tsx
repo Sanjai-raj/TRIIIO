@@ -6,18 +6,36 @@ import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { Order } from '../types';
 import { PLACEHOLDER_IMG } from '../src/constants';
-import { FaChevronDown, FaChevronUp, FaBox, FaMapMarkerAlt, FaCreditCard, FaShoppingBag, FaFileInvoice, FaBan, FaTruck, FaCheck } from 'react-icons/fa';
+import { FaChevronDown, FaChevronUp, FaBox, FaMapMarkerAlt, FaCreditCard, FaShoppingBag, FaFileInvoice, FaBan, FaTruck, FaCheck, FaUserEdit, FaUserShield, FaTimes, FaSignOutAlt } from 'react-icons/fa';
+import toast from 'react-hot-toast';
 
 const Orders: React.FC = () => {
-    const { user } = useAuth();
+    const { user, login, logout } = useAuth(); // login used to update local user state
     const { formatPrice } = useCurrency();
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
     const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
     const [cancelling, setCancelling] = useState<string | null>(null);
 
+    // Edit Profile State
+    const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+    const [editForm, setEditForm] = useState({
+        name: '',
+        email: '',
+        phone: '',
+        password: ''
+    });
+    const [isUpdating, setIsUpdating] = useState(false);
+
     useEffect(() => {
         if (user) {
+            setEditForm({
+                name: user.name || '',
+                email: user.email || '',
+                phone: user.phone || '',
+                password: ''
+            });
+
             api.get('/orders/myorders')
                 .then(res => setOrders(res.data))
                 .catch(console.error)
@@ -52,14 +70,35 @@ const Orders: React.FC = () => {
 
         setCancelling(orderId);
         try {
-            api.put(`/orders/${orderId}/cancel`);
+            await api.put(`/orders/${orderId}/cancel`);
             // Update local state
             setOrders(prev => prev.map(o => o._id === orderId ? { ...o, orderStatus: 'Cancelled' } : o));
-            alert("Order cancelled successfully.");
+            toast.success("Order cancelled successfully.");
         } catch (e: any) {
-            alert(e.response?.data?.message || "Failed to cancel order");
+            toast.error(e.response?.data?.message || "Failed to cancel order");
         } finally {
             setCancelling(null);
+        }
+    };
+
+    const handleUpdateProfile = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsUpdating(true);
+        try {
+            const { data } = await api.put('/auth/profile', editForm);
+
+            // Update global user context
+            // We need to re-login with the new user object to update local storage and context
+            // Assuming the existing token is still valid (it should be)
+            login({ token: localStorage.getItem('token') || '', user: data.user });
+
+            toast.success("Profile updated successfully!");
+            setIsEditProfileOpen(false);
+        } catch (error: any) {
+            console.error(error);
+            toast.error(error.response?.data?.message || "Failed to update profile");
+        } finally {
+            setIsUpdating(false);
         }
     };
 
@@ -83,15 +122,52 @@ const Orders: React.FC = () => {
 
     return (
         <div className="max-w-5xl mx-auto px-6 py-12 min-h-screen">
-            <h1 className="text-4xl font-black uppercase tracking-tighter mb-2 text-[#008B9E] font-sans">Order History</h1>
-            <p className="text-gray-500 text-sm mb-10">View and track your past purchases.</p>
+
+            {/* PROFILE HEADER & ACTIONS */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6 bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                <div>
+                    <h1 className="text-3xl font-black uppercase tracking-tighter text-[#008B9E] font-sans mb-1">My Profile</h1>
+                    <div className="text-gray-500 text-sm">
+                        <p className="font-bold text-gray-900 text-lg">{user.name}</p>
+                        <p>{user.email}</p>
+                        <p>{user.phone}</p>
+                    </div>
+                </div>
+
+                <div className="flex flex-wrap gap-4 w-full md:w-auto">
+                    {/* Admin Button */}
+                    {user.role === 'owner' && (
+                        <Link to="/admin/dashboard" className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-[#121217] text-white px-6 py-3 font-bold uppercase tracking-widest hover:bg-gray-800 transition text-xs rounded-full">
+                            <FaUserShield size={14} /> Admin Panel
+                        </Link>
+                    )}
+
+                    {/* Edit Profile Button */}
+                    <button
+                        onClick={() => setIsEditProfileOpen(true)}
+                        className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-[#008B9E] text-white px-6 py-3 font-bold uppercase tracking-widest hover:bg-[#006D7C] transition text-xs rounded-full shadow-lg shadow-[#008B9E]/20"
+                    >
+                        <FaUserEdit size={14} /> Edit Profile
+                    </button>
+
+                    {/* Log Out Button */}
+                    <button
+                        onClick={logout}
+                        className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-red-50 text-red-600 border border-red-200 px-6 py-3 font-bold uppercase tracking-widest hover:bg-red-100 transition text-xs rounded-full"
+                    >
+                        <FaSignOutAlt size={14} /> Log Out
+                    </button>
+                </div>
+            </div>
+
+            <h2 className="text-xl font-black uppercase tracking-tighter mb-6 text-gray-800 font-sans border-b border-gray-100 pb-4">Order History</h2>
 
             {orders.length === 0 ? (
                 <div className="bg-gray-50 p-16 text-center border border-dashed border-gray-300 rounded-sm">
                     <FaBox className="mx-auto text-gray-300 mb-4" size={40} />
                     <h3 className="text-xl font-bold text-gray-900 mb-2 uppercase tracking-wide">No Orders Found</h3>
                     <p className="text-gray-500 mb-8 font-light text-sm">You haven't placed any orders yet. Check out our latest collection.</p>
-                    <Link to="/shop" className="bg-[#008B9E] text-white px-8 py-4 font-bold uppercase tracking-widest hover:bg-[#006D7C] transition text-xs">Start Shopping</Link>
+                    <Link to="/shop" className="bg-[#008B9E] text-white px-8 py-4 font-bold uppercase tracking-widest hover:bg-[#006D7C] transition text-xs rounded-full">Start Shopping</Link>
                 </div>
             ) : (
                 <div className="space-y-8">
@@ -285,6 +361,74 @@ const Orders: React.FC = () => {
                             </div>
                         );
                     })}
+                </div>
+            )}
+
+            {/* Edit Profile Modal */}
+            {isEditProfileOpen && (
+                <div className="fixed inset-0 z-[2000] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 relative animate-fadeIn">
+                        <button
+                            onClick={() => setIsEditProfileOpen(false)}
+                            className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition"
+                        >
+                            <FaTimes size={20} />
+                        </button>
+
+                        <h2 className="text-xl font-black uppercase tracking-tighter text-[#008B9E] mb-6 flex items-center gap-2">
+                            <FaUserEdit /> Edit Profile
+                        </h2>
+
+                        <form onSubmit={handleUpdateProfile} className="space-y-4">
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Name</label>
+                                <input
+                                    type="text"
+                                    required
+                                    className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#008B9E] focus:ring-1 focus:ring-[#008B9E] transition"
+                                    value={editForm.name}
+                                    onChange={e => setEditForm({ ...editForm, name: e.target.value })}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Email</label>
+                                <input
+                                    type="email"
+                                    className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#008B9E] focus:ring-1 focus:ring-[#008B9E] transition"
+                                    value={editForm.email || ''}
+                                    onChange={e => setEditForm({ ...editForm, email: e.target.value })}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Phone</label>
+                                <input
+                                    type="tel"
+                                    required
+                                    className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#008B9E] focus:ring-1 focus:ring-[#008B9E] transition"
+                                    value={editForm.phone}
+                                    onChange={e => setEditForm({ ...editForm, phone: e.target.value })}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">New Password <span className="text-gray-300 font-normal normal-case">(Optional)</span></label>
+                                <input
+                                    type="password"
+                                    placeholder="Leave blank to keep current"
+                                    className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#008B9E] focus:ring-1 focus:ring-[#008B9E] transition"
+                                    value={editForm.password}
+                                    onChange={e => setEditForm({ ...editForm, password: e.target.value })}
+                                />
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={isUpdating}
+                                className="w-full bg-[#008B9E] text-white py-4 rounded-xl font-bold uppercase tracking-widest hover:bg-[#006D7C] transition mt-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                            >
+                                {isUpdating ? 'Saving...' : 'Save Changes'}
+                            </button>
+                        </form>
+                    </div>
                 </div>
             )}
         </div>

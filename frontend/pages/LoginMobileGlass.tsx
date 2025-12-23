@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { api, handleApiError } from "../src/api/client";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useToast } from "../context/ToastContext";
+import { User, Lock, ArrowRight } from "lucide-react";
+import BrandLogo from "../components/BrandLogo";
 
 interface LoginMobileGlassProps {
     onRegisterClick?: () => void;
@@ -14,168 +16,141 @@ const LoginMobileGlass: React.FC<LoginMobileGlassProps> = ({ onRegisterClick }) 
     const { login } = useAuth();
     const navigate = useNavigate();
     const { showToast } = useToast();
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setIsLoading(true);
         try {
-            // Ensure email is set for backend compatibility if it relies on 'email' field for the unified input
             const payload = {
                 ...formData,
-                email: formData.phoneOrEmail // We'll send phoneOrEmail as 'email' because some backends might expect 'email' field or we mirror the Login.tsx logic
+                email: formData.phoneOrEmail
             };
-
-            // In Login.tsx: setFormData({ ...formData, phoneOrEmail: e.target.value, email: e.target.value })
-            // So we should probably do the same here to match exactly.
-
             const { data } = await api.post('/auth/login', payload);
             login(data);
             showToast("Welcome back!", 'success');
-            if (data.user.role === 'owner') navigate('/admin');
+            if (data.user.role === 'owner') navigate('/admin/dashboard');
             else navigate('/');
         } catch (err: any) {
             showToast(handleApiError(err), 'error');
+        } finally {
+            setIsLoading(false);
         }
     };
 
+    // Animation Variants
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: { staggerChildren: 0.1, delayChildren: 0.2 }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { y: 20, opacity: 0 },
+        visible: { y: 0, opacity: 1 }
+    };
+
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#E6F6F8] to-white px-4 sm:hidden">
+        <div className="flex flex-col min-h-screen bg-[#E6F6F8]">
+            {/* 1. TOP BAR - Integrated to remove space  - REMOVED DUE TO DUPLICATION */}
+            {/* <div className="bg-white h-16 flex items-center justify-center px-6 border-b border-gray-100 shadow-sm">
+                <Link to="/" className="flex items-center gap-2">
+                    <BrandLogo className="h-6 w-auto" />
+                    <span className="text-xl font-black tracking-tighter text-[#008B9E]">TRIIIO</span>
+                </Link>
+            </div> */}
 
-            {/* GLASS CARD */}
-            <motion.div
-                initial={{ opacity: 0, y: 28 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-                className="
-          w-full max-w-[360px]
-          rounded-3xl
-          border border-white/40
-          bg-white/30
-          backdrop-blur-xl
-          shadow-[0_20px_40px_rgba(0,139,158,0.18)]
-          px-8 py-8
-          relative
-          overflow-hidden
-        "
-            >
-                {/* subtle glass highlight */}
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/30 to-transparent pointer-events-none" />
-
-                {/* LOGIN TITLE */}
-                <h1
-                    className="
-            text-3xl
-            font-black
-            uppercase
-            tracking-tighter
-            text-center
-            mb-6
-            text-[#008B9E]
-            leading-9
-            font-[Inter]
-            relative
-          "
+            {/* 2. MAIN CONTENT AREA */}
+            <div className="flex-grow flex items-start justify-center px-4 pt-4 pb-10 bg-gradient-to-b from-[#E6F6F8] to-white">
+                <motion.div
+                    initial="hidden"
+                    animate="visible"
+                    variants={containerVariants}
+                    className="w-full max-w-[380px] rounded-[2rem] border border-white/60 bg-white/40 backdrop-blur-2xl shadow-[0_32px_64px_-16px_rgba(0,139,158,0.25)] px-7 py-10 relative overflow-hidden"
                 >
-                    Login
-                </h1>
+                    {/* Header Text */}
+                    <motion.div variants={itemVariants} className="text-center mb-8">
+                        <h1 className="text-4xl font-black uppercase tracking-tighter text-[#008B9E] mb-2 font-sans">
+                            Login
+                        </h1>
+                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-[0.1em] leading-relaxed">
+                            Login using your registered mobile number <br /> or email.
+                        </p>
+                    </motion.div>
 
-                <p className="text-xs text-center text-gray-500 mb-6 uppercase tracking-wide relative">
-                    Login using your registered mobile number or email.
-                </p>
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                        {/* Input: Phone/Email */}
+                        <motion.div variants={itemVariants} className="relative group">
+                            <input
+                                type="text"
+                                placeholder="Phone number or Email"
+                                required
+                                className="w-full h-14 rounded-2xl bg-white/80 border border-teal-100 px-6 pr-12 text-gray-800 placeholder:text-gray-400 placeholder:text-xs placeholder:uppercase focus:outline-none focus:ring-2 focus:ring-[#008B9E]/20 focus:border-[#008B9E] transition-all shadow-sm group-hover:shadow-md"
+                                value={formData.phoneOrEmail}
+                                onChange={e => setFormData({ ...formData, phoneOrEmail: e.target.value, email: e.target.value })}
+                            />
+                            <User size={18} className="absolute right-5 top-1/2 -translate-y-1/2 text-[#008B9E]/60 group-focus-within:text-[#008B9E] transition-colors" />
+                        </motion.div>
 
-                <form onSubmit={handleSubmit}>
-                    {/* Phone or Email */}
-                    <div className="relative w-full h-[50px] mb-5">
-                        <input
-                            type="text"
-                            placeholder="Phone number or Email"
-                            required
-                            className="
-                w-full h-full rounded-full
-                bg-white/70
-                border border-[#008B9E]/30
-                px-5 pr-12
-                text-gray-800
-                placeholder:uppercase placeholder-gray-400
-                focus:outline-none
-                focus:ring-2 focus:ring-[#008B9E]/40
-                transition
-              "
-                            value={formData.phoneOrEmail}
-                            onChange={e => setFormData({ ...formData, phoneOrEmail: e.target.value, email: e.target.value })}
-                        />
-                        <i className="bx bxs-user absolute right-5 top-1/2 -translate-y-1/2 text-[#008B9E] text-lg"></i>
-                    </div>
+                        {/* Input: Password */}
+                        <motion.div variants={itemVariants} className="relative group">
+                            <input
+                                type="password"
+                                placeholder="Password"
+                                required
+                                className="w-full h-14 rounded-2xl bg-white/80 border border-teal-100 px-6 pr-12 text-gray-800 placeholder:text-gray-400 placeholder:text-xs placeholder:uppercase focus:outline-none focus:ring-2 focus:ring-[#008B9E]/20 focus:border-[#008B9E] transition-all shadow-sm group-hover:shadow-md"
+                                value={formData.password}
+                                onChange={e => setFormData({ ...formData, password: e.target.value })}
+                            />
+                            <Lock size={18} className="absolute right-5 top-1/2 -translate-y-1/2 text-[#008B9E]/60 group-focus-within:text-[#008B9E] transition-colors" />
+                        </motion.div>
 
-                    {/* Password */}
-                    <div className="relative w-full h-[50px] mb-4">
-                        <input
-                            type="password"
-                            placeholder="Password"
-                            required
-                            className="
-                w-full h-full rounded-full
-                bg-white/70
-                border border-[#008B9E]/30
-                px-5 pr-12
-                text-gray-800
-                placeholder:uppercase placeholder-gray-400
-                focus:outline-none
-                focus:ring-2 focus:ring-[#008B9E]/40
-                transition
-              "
-                            value={formData.password}
-                            onChange={e => setFormData({ ...formData, password: e.target.value })}
-                        />
-                        <i className="bx bxs-lock-alt absolute right-5 top-1/2 -translate-y-1/2 text-[#008B9E] text-lg"></i>
-                    </div>
+                        {/* Helpers */}
+                        <motion.div variants={itemVariants} className="flex justify-between items-center px-1">
+                            <label className="flex items-center gap-2 cursor-pointer group">
+                                <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-[#008B9E] focus:ring-[#008B9E] accent-[#008B9E]" />
+                                <span className="text-xs font-medium text-gray-600 group-hover:text-[#008B9E] transition-colors">Remember me</span>
+                            </label>
+                            <button type="button" className="text-xs font-bold text-[#008B9E] hover:underline uppercase tracking-tighter">
+                                Forgot?
+                            </button>
+                        </motion.div>
 
-                    {/* Remember / Forgot */}
-                    <div className="flex justify-between items-center text-xs mb-5 text-[#008B9E] relative">
-                        <label className="flex items-center gap-1">
-                            <input type="checkbox" className="accent-[#008B9E]" />
-                            Remember me
-                        </label>
-                        <a href="#" className="hover:underline">
-                            Forgot?
-                        </a>
-                    </div>
-
-                    {/* LOGIN BUTTON */}
-                    <motion.button
-                        type="submit"
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.96 }}
-                        transition={{ type: "spring", stiffness: 320 }}
-                        className="
-              w-full h-[46px]
-              rounded-full
-              bg-[#008B9E]
-              text-white
-              font-semibold
-              shadow-lg
-              active:bg-[#006F7D]
-              transition
-              relative
-            "
-                    >
-                        Log in
-                    </motion.button>
-                </form>
-
-                {/* Register */}
-                <div className="text-center text-xs mt-5 text-gray-700 relative">
-                    <p>
-                        NEW HERE?{" "}
-                        <a
-                            href="#"
-                            onClick={(e) => { e.preventDefault(); onRegisterClick && onRegisterClick(); }}
-                            className="font-semibold text-[#008B9E] underline"
+                        {/* Submit Button */}
+                        <motion.button
+                            variants={itemVariants}
+                            whileHover={{ scale: 1.01 }}
+                            whileTap={{ scale: 0.98 }}
+                            disabled={isLoading}
+                            className="w-full h-14 rounded-2xl bg-[#008B9E] text-white font-bold text-sm uppercase tracking-widest shadow-[0_12px_24px_-8px_rgba(0,139,158,0.5)] hover:bg-[#007a8a] transition-all flex items-center justify-center gap-2"
                         >
-                            CREATE ACCOUNT
-                        </a>
-                    </p>
-                </div>
-            </motion.div>
+                            {isLoading ? "Authenticating..." : (
+                                <>
+                                    Log in <ArrowRight size={18} />
+                                </>
+                            )}
+                        </motion.button>
+                    </form>
+
+                    {/* Footer */}
+                    <motion.div variants={itemVariants} className="text-center mt-8">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                            New Here?{" "}
+                            <button
+                                onClick={onRegisterClick}
+                                className="text-[#008B9E] underline decoration-2 underline-offset-4 ml-1 hover:text-[#006f7d]"
+                            >
+                                Create Account
+                            </button>
+                        </p>
+                    </motion.div>
+                </motion.div>
+            </div>
+
+            {/* Space for the bottom navbar if needed */}
+            <div className="h-20" />
         </div>
     );
 };
