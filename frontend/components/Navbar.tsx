@@ -10,9 +10,9 @@ import { Product } from '../types';
 import BrandLogo from './BrandLogo';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-    FaShoppingCart, FaBars, FaTimes, FaSearch, FaHeart
+    FaShoppingCart, FaSearch, FaHeart
 } from 'react-icons/fa';
-import MobileDrawer from './MobileDrawer';
+import MobileNavbar from './MobileNavbar';
 
 const MotionDiv = motion.div as any;
 
@@ -22,16 +22,7 @@ const Navbar: React.FC = () => {
     const { user, logout } = useAuth();
     const { itemCount, items, cartTotal } = useCart();
     const { wishlist } = useWishlist();
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const location = useLocation();
-
-    // Prevent background scroll when mobile menu is open
-    useEffect(() => {
-        document.body.style.overflow = isMenuOpen ? "hidden" : "auto";
-        return () => {
-            document.body.style.overflow = "auto";
-        };
-    }, [isMenuOpen]);
 
 
     // Live Search State
@@ -40,9 +31,8 @@ const Navbar: React.FC = () => {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const searchRef = useRef<HTMLDivElement>(null);
 
-    // Close mobile menu on route change
+    // Close mobile menu on route change - Keeping search cleanup
     useEffect(() => {
-        setIsMenuOpen(false);
         setIsSearchOpen(false);
         setSearchQuery('');
     }, [location]);
@@ -82,15 +72,17 @@ const Navbar: React.FC = () => {
 
     return (
         <>
-            <nav className={navClasses}>
+            {/* Mobile Navbar - Visible only on small screens */}
+            <div className="md:hidden">
+                <MobileNavbar />
+            </div>
+
+            {/* Desktop Navbar - Hidden on small screens */}
+            <nav className={`${navClasses} hidden md:block`}>
                 <div className="container mx-auto px-6 h-20 grid grid-cols-3 items-center relative">
 
                     {/* LEFT: Nav & Search Toggle */}
                     <div className="flex items-center justify-start gap-6">
-                        <button className="md:hidden text-[#008B9E] focus:outline-none" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                            {isMenuOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
-                        </button>
-
                         <div className="hidden md:flex items-center gap-6">
                             <Link to="/" className="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-[#008B9E] transition-colors duration-300">Home</Link>
                             <Link to="/shop" className="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-[#008B9E] transition-colors duration-300">Shop</Link>
@@ -269,8 +261,6 @@ const Navbar: React.FC = () => {
                     </div>
                 </div>
             </nav>
-
-            <MobileDrawer open={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
         </>
     );
 };
